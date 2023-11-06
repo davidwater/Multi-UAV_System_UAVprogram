@@ -5,6 +5,7 @@ import numpy as np
 import dubins
 import pathFollowing as pf
 from GA_SEAD_process import *
+from SDPSO import *
 
 
 class packet_processing(object):
@@ -232,7 +233,14 @@ class packet_processing(object):
                 for i in range(NnT):
                     self.uavs_info[9].append(list(np.multiply(unpack('ii', packet[43+Nt*5+Nct*2+i*8:43+Nt*5+Nct*2+(i+1)*8]), 1e-3)))
                 self.task_locking.append(fix)
-            return Message_ID.SEAD, None            
+            return Message_ID.SEAD, None  
+
+        elif msg_id == Message_ID.SDPSO:
+            if packet == self.uav_id:
+                uav_type = packet[2]
+            
+        else:
+            return Message_ID.info, "Wrong UAV for SDPSO"          
 
 
 class Message_ID(Enum):
@@ -249,6 +257,7 @@ class Message_ID(Enum):
     info = 44
     SEAD = 17          # (U2U)
     SEAD_mission = 18  # (G2U)
+    SDPSO = 20         # (G2U)
 
 
 class Mode(Enum):
