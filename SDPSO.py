@@ -379,12 +379,12 @@ def plot_path(it, x1, y1, x2, y2):
 
 if __name__ == "__main__":
     # initial parameters
+    xv1 = 0; yv1 = 0; xv2 = 0; yv2 = 0
     xs1 = -40; ys1 = -40; xg1 = 40; yg1 = 40
     xs2 = 40; ys2 = 40; xg2 = -40; yg2 = -40
-    iteration = 1000
+    v = np.matrix([xv1, yv1, xv2, yv2])
     start = np.matrix([xs1, ys1, xs2, ys2])
     target = np.matrix([xg1, yg1, xg2, yg2])
-    v = np.matrix([0, 0, 0, 0])
     path_1 = np.array([[xs1, ys1]])
     path_2 = np.array([[xs2, ys2]])
     h1 = heading(xn=start[0,0], target_xn=target[0,0], yn=start[0,1], target_yn=target[0,1])
@@ -396,7 +396,7 @@ if __name__ == "__main__":
         path_2[0, 0] += 0.01
     h =np.matrix([h1, h2])
 
-
+    iteration = 1000
     ds = 10
     Varsize = 4
     it = 0
