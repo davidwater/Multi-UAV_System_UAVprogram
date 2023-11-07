@@ -1,7 +1,6 @@
 import numpy as np
 import time
 import math
-import random
 import matplotlib.pyplot as plt
 from scipy.interpolate import splrep, BSpline
 
@@ -42,7 +41,7 @@ class SDPSO(object):
         self.w3 = 1          # relative weight factor of cost funtion 3
         'simulated annealing (SA) parameters'
         self.p = 0             # initial probability of a suboptimal solution being accepted
-        self.rand = random.random()
+        self.rand = np.random.rand()
         self.T = 1             # temperature of current system (T=1)
         'acceleration of convergence based on dimensional learning strategy (DLS)' 
         self.count = 0         # non-updating number
@@ -179,8 +178,11 @@ class SDPSO(object):
                         self.w = self.w * self.wdamp
                         r = (self.MaxIt - j) / self.MaxIt
                         self.T = self.T * r
-                        self.p = math.exp(-(self.GlobalBest_Cost - self.pre_GlobalBest_Cost)/self.T)
-                        self.rand = random.random()
+                        try:
+                            self.p = math.exp(-(self.GlobalBest_Cost - self.pre_GlobalBest_Cost)/self.T)
+                        except:
+                            self.p = math.inf
+                        self.rand = np.random.rand()
                         self.m = (j / self.MaxIt) * (self.VarMax - self.VarMin)
         # without collision potential
         else:
@@ -377,9 +379,9 @@ def plot_path(it, x1, y1, x2, y2):
 
 if __name__ == "__main__":
     # initial parameters
+    xs1 = -40; ys1 = -40; xg1 = 40; yg1 = 40
+    xs2 = 40; ys2 = 40; xg2 = -40; yg2 = -40
     iteration = 1000
-    xs1 = -41; ys1 = -41; xg1 = 40; yg1 = 40
-    xs2 = 41; ys2 = 41; xg2 = -40; yg2 = -40
     start = np.matrix([xs1, ys1, xs2, ys2])
     target = np.matrix([xg1, yg1, xg2, yg2])
     v = np.matrix([0, 0, 0, 0])
@@ -393,6 +395,8 @@ if __name__ == "__main__":
     elif (h2 == math.pi/4 or h2 == 0.75*math.pi or h2 == -math.pi/4 or h2 == -0.75*math.pi):
         path_2[0, 0] += 0.01
     h =np.matrix([h1, h2])
+
+
     ds = 10
     Varsize = 4
     it = 0
@@ -448,9 +452,12 @@ if __name__ == "__main__":
     path_1 = path_1[path_1[:,0].argsort()]
     path_2 = path_2[path_2[:,0].argsort()]
 
+    s_1 = path_1.shape[0] - 3 * math.sqrt(2 * path_1.shape[0])
+    s_2 = path_2.shape[0] - 3 * math.sqrt(2 * path_2.shape[0])
+
     # spline regression
-    tck_1 = splrep(path_1[:,0], path_1[:,1], s = 30)
-    tck_2 = splrep(path_2[:,0], path_2[:,1], s = 30)
+    tck_1 = splrep(path_1[:,0], path_1[:,1], s = s_1)
+    tck_2 = splrep(path_2[:,0], path_2[:,1], s = s_2)
     plt.scatter(path_1[:,0], path_1[:,1], color = 'red', s=1, label = 'UAV 1')
     plt.scatter(path_2[:,0], path_2[:,1], color = 'blue', s=1, label = 'UAV 2')
     plt.plot(path_1[:,0], BSpline(*tck_1)(path_1[:,0]), label = 'UAV 1 spline')

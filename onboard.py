@@ -196,6 +196,11 @@ if __name__ == "__main__":
                     taskAllocationProcess.start()
                     if not UAV.mode == Mode.GUIDED.name:
                         success = UAV.set_mode(Mode.GUIDED.name)
+
+                elif messageType == Message_ID.SDPSO:
+                    height = np.round(UAV.local_pose[2])
+                    Mission = Message_ID.SDPSO
+                    xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"received SDPSO mission", new_timer.t()))
                 
                 elif messageType == Message_ID.Mission_Abort:
                     Mission = Message_ID.Mission_Abort
@@ -289,6 +294,9 @@ if __name__ == "__main__":
                 UAV.velocity_control([0, 0, 0])
             elif UAV.frame_type == FrameType.Fixed_wing:
                 UAV.set_mode(Mode.LOITER.name)
+
+        elif Mission == Message_ID.SDPSO:
+
             
         ' Mission cancal mechanism '
         if UAV.mode in stop_mode:
