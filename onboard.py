@@ -295,7 +295,8 @@ if __name__ == "__main__":
                 mainProcess.run_simulation(xbee, data, UAV, new_timer, gcs_address, waypoint_radius)
 
         elif Mission == Message_ID.SDPSO:
-            path_1, path_2, h, d_total, cost = generate_path(sdpso.start, sdpso.target)
+            v = np.array([0,0,0,0])
+            path_1, path_2, h, d_total, cost = generate_path(sdpso.start, sdpso.target, v)
             path_1, path_2 = smooth_path(path_1, path_2)
             UAV.v = 3
 
