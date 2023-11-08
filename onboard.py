@@ -10,7 +10,7 @@ import DPGA
 from SDPSO_main import *
 
 
-t = time
+t = time.time
 
 class Timer(object):
     def __init__(self):
@@ -76,7 +76,7 @@ if __name__ == "__main__":
     ' => ROS connection '
     rospy.init_node('drone', anonymous=True)    
     UAV = Drone()
-    sdpso = SDPSO(np.array([0,0,0,0]), np.array([0,0,0,0]), np.array([0,0,0,0]), np.array([0,0]), np.array([0,0]), np.array([0,0]), it = 0, ds = 10, Varsize = 4)
+    sdpso = SDPSO(np.matrix([0,0,0,0]), np.matrix([0,0,0,0]), np.matrix([0,0,0,0]), np.matrix([0,0]), np.array([0,0]), np.array([0,0]), it = 0, ds = 10, Varsize = 4)
     
     ' => Communication setting '
     data = packet_processing(uav_id)
