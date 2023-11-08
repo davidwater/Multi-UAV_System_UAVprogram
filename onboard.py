@@ -301,9 +301,9 @@ if __name__ == "__main__":
             UAV.v = 3
 
             if uav_id == XBee_Devices.UAV1:
-                tracking = CraigReynolds_Path_Following(path = path_1, path_window = 3, Kp = 1, Kd = 5)
-                desirePoint, index, _, error_of_distance = CRPF.get_desirePoint_withWindow(UAV.v, UAV.local_pose[0], UAV.local_pose[1], UAV.yaw, index)
-                u, pre_error = CRPF.PID_control(UAV.v, UAV.Rmin, UAV.local_pose, UAV.yaw, desirePoint, pre_error)
+                tracking1 = CraigReynolds_Path_Following(path = path_1, path_window = 3, Kp = 1, Kd = 5)
+                desirePoint, index, _, error_of_distance = tracking1.get_desirePoint_withWindow(UAV.v, UAV.local_pose[0], UAV.local_pose[1], UAV.yaw, index)
+                u, pre_error = tracking1.PID_control(UAV.v, UAV.Rmin, UAV.local_pose, UAV.yaw, desirePoint, pre_error)
                 if error_of_distance <= 0 and completed:
                     target_V, u = 0, 0
                 else:
@@ -311,9 +311,9 @@ if __name__ == "__main__":
                 v_z = 0.3 * (height - UAV.local_pose[2])  # altitude hold
                 UAV.velocity_bodyFrame_control(target_V, u, v_z)
             elif uav_id == XBee_Devices.UAV2:
-                tracking = CraigReynolds_Path_Following(path = path_2, path_window = 3, Kp = 1, Kd = 5)
-                desirePoint, index, _, error_of_distance = CRPF.get_desirePoint_withWindow(UAV.v, UAV.local_pose[0], UAV.local_pose[1], UAV.yaw, index)
-                u, pre_error = CRPF.PID_control(UAV.v, UAV.Rmin, UAV.local_pose, UAV.yaw, desirePoint, pre_error)
+                tracking2 = CraigReynolds_Path_Following(path = path_2, path_window = 3, Kp = 1, Kd = 5)
+                desirePoint, index, _, error_of_distance = tracking2.get_desirePoint_withWindow(UAV.v, UAV.local_pose[0], UAV.local_pose[1], UAV.yaw, index)
+                u, pre_error = tracking2.PID_control(UAV.v, UAV.Rmin, UAV.local_pose, UAV.yaw, desirePoint, pre_error)
                 if error_of_distance <= 0 and completed:
                     target_V, u = 0, 0
                 else:
