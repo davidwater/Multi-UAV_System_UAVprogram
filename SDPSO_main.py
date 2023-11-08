@@ -65,8 +65,8 @@ class SDPSO(object):
         # collision potential
         if math.sqrt((self.path_1[self.it,0] - self.path_2[self.it,0]) ** 2 + (self.path_1[self.it,1] - self.path_2[self.it,1]) ** 2) < self.ds:
             # initialization
-            self.Position = np.random.uniform(self.VarMin, self.VarMax, [self.nPop_max,Varsize])  
-            self.Velocity = np.random.uniform(self.VarMin, self.VarMax, [self.nPop_max,Varsize])
+            self.Position = np.random.uniform(self.VarMin, self.VarMax, [self.nPop_max, self.Varsize])  
+            self.Velocity = np.random.uniform(self.VarMin, self.VarMax, [self.nPop_max, self.Varsize])
             for i in range(self.nPop_max):
                 ax1 = self.Position[i,0]
                 ay1 = self.Position[i,1]
@@ -187,8 +187,8 @@ class SDPSO(object):
         # without collision potential
         else:
             # initialization
-            self.Position = np.random.uniform(self.VarMin, self.VarMax, [self.nPop_min,Varsize])  
-            self.Velocity = np.random.uniform(self.VarMin, self.VarMax, [self.nPop_min,Varsize])
+            self.Position = np.random.uniform(self.VarMin, self.VarMax, [self.nPop_min, self.Varsize])  
+            self.Velocity = np.random.uniform(self.VarMin, self.VarMax, [self.nPop_min, self.Varsize])
             for i in range(self.nPop_min):
                 ax1 = self.Position[i,0]
                 ay1 = self.Position[i,1]
@@ -377,14 +377,7 @@ def plot_path(it, x1, y1, x2, y2):
     plt.pause(0.5)
     return None
 
-if __name__ == "__main__":
-    # initial parameters
-    xv1 = 0; yv1 = 0; xv2 = 0; yv2 = 0
-    xs1 = -40; ys1 = -40; xg1 = 40; yg1 = 40
-    xs2 = 40; ys2 = 40; xg2 = -40; yg2 = -40
-    v = np.matrix([xv1, yv1, xv2, yv2])
-    start = np.matrix([xs1, ys1, xs2, ys2])
-    target = np.matrix([xg1, yg1, xg2, yg2])
+def generate_path(start, target, v):
     path_1 = np.array([[xs1, ys1]])
     path_2 = np.array([[xs2, ys2]])
     h1 = heading(xn=start[0,0], target_xn=target[0,0], yn=start[0,1], target_yn=target[0,1])
@@ -406,12 +399,12 @@ if __name__ == "__main__":
     d_total = 0 # total moving distance
     df = 10    # acceptance distance
     cost = np.zeros(1)   # cost value
-    start_time = time.time()
     
     for it in range (iteration):
         wypt = SDPSO(start, target, v, h, path_1, path_2, it, ds, Varsize)
         vxn1, vyn1, vxn2, vyn2, cost_ = wypt.iteration()
         cost = np.append(cost, cost_, axis = 0)
+        cost = np.round(cost, 4)
         v = np.append(v, [[vxn1, vyn1, vxn2, vyn2]], axis = 0)
         # body frame to world frame
         wvx1, wvy1, wvx2, wvy2 = b2w(vxn1, vyn1, vxn2, vyn2, h[0,0], h[0,1])
@@ -422,7 +415,7 @@ if __name__ == "__main__":
         path_2_y = np.round(path_2[it,1] + wvy2*dt, 4)
         path_1 = np.append(path_1, [[path_1_x, path_1_y]], axis = 0)
         path_2 = np.append(path_2, [[path_2_x, path_2_y]], axis = 0)
-        print(f'iteration: {it+1}, UAV1_x: {path_1[it+1, 0]}, UAV1_y: {path_1[it+1, 1]}, UAV2_x: {path_2[it+1, 0]}, UAV2_y: {path_2[it+1, 1]}, cost: {cost[it+1]}')
+        # print(f'iteration: {it+1}, UAV1_x: {path_1[it+1, 0]}, UAV1_y: {path_1[it+1, 1]}, UAV2_x: {path_2[it+1, 0]}, UAV2_y: {path_2[it+1, 1]}, cost: {cost[it+1]}')
         # update heading
         h1_ = heading(path_1_x, target[0,0], path_1_y, target[0,1])
         h2_ = heading(path_2_x, target[0,2], path_2_y, target[0,3])
@@ -447,13 +440,44 @@ if __name__ == "__main__":
             # plot_path(it, np.array(path_1[:, 0]), np.array(path_1[:, 1]), np.array(path_2[:, 0]), np.array(path_2[:, 1]))
             # plt.show()
             break
+    
+    return path_1, path_2, h, d_total, cost  
+
+def smooth_path(path_1, path_2):
+    # sort array
+    path_1 = path_1[path_1[:,0].argsort()]
+    path_2 = path_2[path_2[:,0].argsort()]
+
+    s_1 = path_1.shape[0] - 4 * math.sqrt(2 * path_1.shape[0])
+    s_2 = path_2.shape[0] - 4 * math.sqrt(2 * path_2.shape[0])
+
+    # spline regression
+    tck_1 = splrep(path_1[:,0], path_1[:,1], s = s_1)
+    tck_2 = splrep(path_2[:,0], path_2[:,1], s = s_2)
+
+    path_1[:,1] = BSpline(*tck_1)(path_1[:,0])
+    path_2[:,1] = BSpline(*tck_2)(path_2[:,0])
+
+    return path_1, path_2
+
+if __name__ == "__main__":
+    # initial parameters
+    xv1 = 0; yv1 = 0; xv2 = 0; yv2 = 0
+    xs1 = -40; ys1 = -40; xg1 = 40; yg1 = 40
+    xs2 = 40; ys2 = 40; xg2 = -40; yg2 = -40
+    v = np.matrix([xv1, yv1, xv2, yv2])
+    start = np.matrix([xs1, ys1, xs2, ys2])
+    target = np.matrix([xg1, yg1, xg2, yg2])
+    start_time = time.time()
+    path_1, path_2, h, d_total, cost = generate_path(start, target, v)
 
     # sort array
     path_1 = path_1[path_1[:,0].argsort()]
     path_2 = path_2[path_2[:,0].argsort()]
 
-    s_1 = path_1.shape[0] - 3 * math.sqrt(2 * path_1.shape[0])
-    s_2 = path_2.shape[0] - 3 * math.sqrt(2 * path_2.shape[0])
+    s_1 = path_1.shape[0] - 4 * math.sqrt(2 * path_1.shape[0])
+    s_2 = path_2.shape[0] - 4 * math.sqrt(2 * path_2.shape[0])
+    it = cost.shape[0]
 
     # spline regression
     tck_1 = splrep(path_1[:,0], path_1[:,1], s = s_1)

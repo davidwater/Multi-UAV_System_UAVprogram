@@ -5,7 +5,6 @@ import numpy as np
 import dubins
 import pathFollowing as pf
 from GA_SEAD_process import *
-from SDPSO import *
 
 
 class packet_processing(object):
@@ -84,8 +83,7 @@ class packet_processing(object):
         packet = pack('<BBBiiiiiiiiiiiii', Message_ID.SDPSO.value, self.uav_id, uav_type, int(uav_Rmin*1e3),
                       int(uav_velocity[0,0]*1e3), int(uav_velocity[0,1]*1e3), int(uav_velocity[0,2]*1e3), int(uav_velocity[0,3]*1e3),
                       int(uav_start[0,0]*1e3), int(uav_start[0,1]*1e3), int(uav_start[0,2]*1e3), int(uav_start[0,3]*1e3),
-                      int(uav_target[0,0]*1e3), int(uav_target[0,1]*1e3), int(uav_target[0,2]*1e3), int(uav_target[0,3]*1e3)
-                      )
+                      int(uav_target[0,0]*1e3), int(uav_target[0,1]*1e3), int(uav_target[0,2]*1e3), int(uav_target[0,3]*1e3))
         'Add the information of the UAV itself'
         self.uavs_info[0].append(self.uav_id)
         self.uavs_info[1].append(uav_type)
@@ -275,7 +273,7 @@ class packet_processing(object):
                 yg1 = unpack('i', packet[43:47])[0] * 1e-3 # yg2
                 xg2 = unpack('i', packet[51:55])[0] * 1e-3 # xg2
                 yg2 = unpack('i', packet[55:59])[0] * 1e-3 # yg2
-            return Message_ID.SDPSO, [[vx1, vy1, vx2, vy2], [xs1, ys1, xs2, ys2], [xg1, yg1, xg2, yg2]]
+            return Message_ID.SDPSO, [[uav_type, Rmin], np.array([[vx1, vy1, vx2, vy2], [xs1, ys1, xs2, ys2], [xg1, yg1, xg2, yg2]])]
         else:
             return Message_ID.info, "Wrong UAV for SDPSO"          
 

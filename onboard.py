@@ -7,6 +7,7 @@ from time import time
 import rospy
 import multiprocessing as mp
 import DPGA
+from SDPSO_main import *
 
 
 t = time
@@ -75,6 +76,7 @@ if __name__ == "__main__":
     ' => ROS connection '
     rospy.init_node('drone', anonymous=True)    
     UAV = Drone()
+    sdpso = SDPSO()
     
     ' => Communication setting '
     data = packet_processing(uav_id)
@@ -201,6 +203,11 @@ if __name__ == "__main__":
                     height = np.round(UAV.local_pose[2])
                     Mission = Message_ID.SDPSO
                     xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"received SDPSO mission", new_timer.t()))
+                    UAV.type = info[0,0]
+                    UAV.Rmin = info[0,1]
+                    sdpso.v = np.array([[info[1][0,0], info[1][0,1], info[1][0,2], info[1][0,3]]])
+                    sdpso.start = np.array([[info[1][1,0], info[1][1,1], info[1][1,2], info[1][1,3]]])
+                    sdpso.target = np.array([[info[1][2,0], info[1][2,1], info[1][2,2], info[1][2,3]]])                   
                 
                 elif messageType == Message_ID.Mission_Abort:
                     Mission = Message_ID.Mission_Abort
@@ -289,13 +296,38 @@ if __name__ == "__main__":
             else:
                 mainProcess.run_simulation(xbee, data, UAV, new_timer, gcs_address, waypoint_radius)
 
+        elif Mission == Message_ID.SDPSO:
+            path_1, path_2, h, d_total, cost = generate_path(sdpso.start, sdpso.target)
+            path_1, path_2 = smooth_path(path_1, path_2)
+            UAV.v = 3
+
+            if uav_id == XBee_Devices.UAV1:
+                tracking = CraigReynolds_Path_Following(path = path_1, path_window = 3, Kp = 1, Kd = 5)
+                desirePoint, index, _, error_of_distance = CRPF.get_desirePoint_withWindow(UAV.v, UAV.local_pose[0], UAV.local_pose[1], UAV.yaw, index)
+                u, pre_error = CRPF.PID_control(UAV.v, UAV.Rmin, UAV.local_pose, UAV.yaw, desirePoint, pre_error)
+                if error_of_distance <= 0 and completed:
+                    target_V, u = 0, 0
+                else:
+                    target_V = UAV.v
+                v_z = 0.3 * (height - UAV.local_pose[2])  # altitude hold
+                UAV.velocity_bodyFrame_control(target_V, u, v_z)
+            elif uav_id == XBee_Devices.UAV2:
+                tracking = CraigReynolds_Path_Following(path = path_2, path_window = 3, Kp = 1, Kd = 5)
+                desirePoint, index, _, error_of_distance = CRPF.get_desirePoint_withWindow(UAV.v, UAV.local_pose[0], UAV.local_pose[1], UAV.yaw, index)
+                u, pre_error = CRPF.PID_control(UAV.v, UAV.Rmin, UAV.local_pose, UAV.yaw, desirePoint, pre_error)
+                if error_of_distance <= 0 and completed:
+                    target_V, u = 0, 0
+                else:
+                    target_V = UAV.v
+                v_z = 0.3 * (height - UAV.local_pose[2])  # altitude hold
+                UAV.velocity_bodyFrame_control(target_V, u, v_z)
+
+
         elif Mission == Message_ID.Mission_Abort:
             if UAV.frame_type == FrameType.Quad:
                 UAV.velocity_control([0, 0, 0])
             elif UAV.frame_type == FrameType.Fixed_wing:
                 UAV.set_mode(Mode.LOITER.name)
-
-        elif Mission == Message_ID.SDPSO:
 
             
         ' Mission cancal mechanism '
