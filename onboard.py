@@ -76,7 +76,7 @@ if __name__ == "__main__":
     ' => ROS connection '
     rospy.init_node('drone', anonymous=True)    
     UAV = Drone()
-    sdpso = SDPSO()
+    sdpso = SDPSO(start = [], target = [], v = [], h = [], path_1 = [], path_2 = [], it = 0, ds = 10, Varsize = 4)
     
     ' => Communication setting '
     data = packet_processing(uav_id)
@@ -203,7 +203,6 @@ if __name__ == "__main__":
                     height = np.round(UAV.local_pose[2])
                     Mission = Message_ID.SDPSO
                     xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"received SDPSO mission", new_timer.t()))
-                    UAV.type = info[0,0]
                     UAV.Rmin = info[0,1]
                     sdpso.start = np.array([[info[1][0,0], info[1][0,1], info[1][0,2], info[1][0,3]]])
                     sdpso.target = np.array([[info[1][1,0], info[1][1,1], info[1][1,2], info[1][1,3]]])                   

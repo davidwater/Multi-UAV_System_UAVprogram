@@ -86,11 +86,9 @@ class packet_processing(object):
                       int(uav_target[0,0]*1e3), int(uav_target[0,1]*1e3), int(uav_target[0,2]*1e3), int(uav_target[0,3]*1e3))
         'Add the information of the UAV itself'
         self.uavs_info[0].append(self.uav_id)
-        self.uavs_info[1].append(uav_type)
-        self.uavs_info[2].append(uav_Rmin)
-        self.uavs_info[3].append(uav_velocity)
-        self.uavs_info[4].append(uav_start)
-        self.uavs_info[5].append(uav_target)
+        self.uavs_info[1].append(uav_Rmin)
+        self.uavs_info[2].append(uav_start)
+        self.uavs_info[3].append(uav_target)
         return packet
 
     def SEAD_info_clear(self):
@@ -256,18 +254,18 @@ class packet_processing(object):
 
         elif msg_id == Message_ID.SDPSO:
             if packet[1] == self.uav_id:
-                uav_type = packet[2]
-                Rmin = unpack('i', packet[3:7])[0] * 1e-3 # Rmin
 
-                xs1 = unpack('i', packet[7:11])[0] * 1e-3 # xs1
-                ys1 = unpack('i', packet[11:15])[0] * 1e-3 # ys1
-                xs2 = unpack('i', packet[15:19])[0] * 1e-3 # xs2
-                ys2 = unpack('i', packet[19:23])[0] * 1e-3 # ys2
+                Rmin = unpack('i', packet[2:6])[0] * 1e-3 # Rmin
 
-                xg1 = unpack('i', packet[23:27])[0] * 1e-3 # xg1
-                yg1 = unpack('i', packet[27:31])[0] * 1e-3 # yg2
-                xg2 = unpack('i', packet[31:35])[0] * 1e-3 # xg2
-                yg2 = unpack('i', packet[35:39])[0] * 1e-3 # yg2
+                xs1 = unpack('i', packet[6:10])[0] * 1e-3 # xs1
+                ys1 = unpack('i', packet[10:14])[0] * 1e-3 # ys1
+                xs2 = unpack('i', packet[14:18])[0] * 1e-3 # xs2
+                ys2 = unpack('i', packet[18:22])[0] * 1e-3 # ys2
+
+                xg1 = unpack('i', packet[22:26])[0] * 1e-3 # xg1
+                yg1 = unpack('i', packet[26:30])[0] * 1e-3 # yg2
+                xg2 = unpack('i', packet[30:34])[0] * 1e-3 # xg2
+                yg2 = unpack('i', packet[34:38])[0] * 1e-3 # yg2
             return Message_ID.SDPSO, [[uav_type, Rmin], np.array([[xs1, ys1, xs2, ys2], [xg1, yg1, xg2, yg2]])]
         else:
             return Message_ID.info, "Wrong UAV for SDPSO"          
