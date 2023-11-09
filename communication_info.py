@@ -73,22 +73,19 @@ class packet_processing(object):
         self.task_locking.append(fix)
         return packet, UAV_pos
     
-    def pack_SDPSO_packet(self, uav_type, uav_Rmin, uav_velocity, uav_start, uav_target):
+    def pack_SDPSO_packet(self, uav_start, uav_target):
         '''
-        [type, v, Rmin, start, target]
-        v = np.matrix([v1x v1y v2x v2y])
+        [message_id, uav_id, start, target]
         start = np.matrix([xs1 ys1 xs2 ys2])
         target = np.matrix([xg1 yg1 xg2 yg2])
         '''
-        packet = pack('<BBBiiiiiiiiiiiii', Message_ID.SDPSO.value, self.uav_id, uav_type, int(uav_Rmin*1e3),
-                      int(uav_velocity[0,0]*1e3), int(uav_velocity[0,1]*1e3), int(uav_velocity[0,2]*1e3), int(uav_velocity[0,3]*1e3),
-                      int(uav_start[0,0]*1e3), int(uav_start[0,1]*1e3), int(uav_start[0,2]*1e3), int(uav_start[0,3]*1e3),
-                      int(uav_target[0,0]*1e3), int(uav_target[0,1]*1e3), int(uav_target[0,2]*1e3), int(uav_target[0,3]*1e3))
+        packet = pack('<BBiiii', Message_ID.SDPSO.value, self.uav_id,
+                      int(uav_start[0,0]*1e3), int(uav_start[0,1]*1e3),
+                      int(uav_target[0,0]*1e3), int(uav_target[0,1]*1e3))
         'Add the information of the UAV itself'
         self.uavs_info[0].append(self.uav_id)
-        self.uavs_info[1].append(uav_Rmin)
-        self.uavs_info[2].append(uav_start)
-        self.uavs_info[3].append(uav_target)
+        self.uavs_info[1].append(uav_start)
+        self.uavs_info[2].append(uav_target)
         return packet
 
     def SEAD_info_clear(self):
@@ -257,20 +254,14 @@ class packet_processing(object):
 
                 Rmin = unpack('i', packet[2:6])[0] * 1e-3 # Rmin
 
-                xs1 = unpack('i', packet[6:10])[0] * 1e-3 # xs1
-                ys1 = unpack('i', packet[10:14])[0] * 1e-3 # ys1
-                hs1  = unpack('i', packet[14:18])[0] * 1e-3 # start heading 1
-                xg1 = unpack('i', packet[18:22])[0] * 1e-3 # xg1
-                yg1 = unpack('i', packet[22:26])[0] * 1e-3 # yg2
-                hg1  = unpack('i', packet[26:30])[0] * 1e-3 # final heading 1
+                xs = unpack('i', packet[6:10])[0] * 1e-3 # xs1
+                ys = unpack('i', packet[10:14])[0] * 1e-3 # ys1
+                hs  = unpack('i', packet[14:18])[0] * 1e-3 # start heading 1
+                xg = unpack('i', packet[18:22])[0] * 1e-3 # xg1
+                yg = unpack('i', packet[22:26])[0] * 1e-3 # yg2
+                hg  = unpack('i', packet[26:30])[0] * 1e-3 # final heading 1
 
-                xs2 = unpack('i', packet[30:34])[0] * 1e-3 # xs2
-                ys2 = unpack('i', packet[34:38])[0] * 1e-3 # ys2
-                hs2  = unpack('i', packet[38:42])[0] * 1e-3 # start heading 2
-                xg2 = unpack('i', packet[42:46])[0] * 1e-3 # xg2
-                yg2 = unpack('i', packet[46:52])[0] * 1e-3 # yg2
-                hg2  = unpack('i', packet[52:56])[0] * 1e-3 # final heading 2
-            return Message_ID.SDPSO, [[Rmin], np.array([[xs1, ys1, xs2, ys2], [xg1, yg1, xg2, yg2]])]
+            return Message_ID.SDPSO, [[Rmin], np.array([[xs, ys], [xg, yg]])]
         else:
             return Message_ID.info, "Wrong UAV for SDPSO"          
 

@@ -204,8 +204,8 @@ if __name__ == "__main__":
                     Mission = Message_ID.SDPSO
                     xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"received SDPSO mission", new_timer.t()))
                     UAV.Rmin = info[0,0]
-                    sdpso.start = np.array([[info[1][0,0], info[1][0,1], info[1][0,2], info[1][0,3]]])
-                    sdpso.target = np.array([[info[1][1,0], info[1][1,1], info[1][1,2], info[1][1,3]]])                   
+                    sdpso.start[0,0:2] = np.array([[info[1][0,0], info[1][0,1]]])
+                    sdpso.target[0,0:2] = np.array([[info[1][1,0], info[1][1,1]]])                   
                 
                 elif messageType == Message_ID.Mission_Abort:
                     Mission = Message_ID.Mission_Abort
@@ -295,6 +295,24 @@ if __name__ == "__main__":
                 mainProcess.run_simulation(xbee, data, UAV, new_timer, gcs_address, waypoint_radius)
 
         elif Mission == Message_ID.SDPSO:
+            data_u2u = packet_processing(uav_id)
+            update = True
+            ' Broadcast every T seceods'
+            if new_timer.check_timer(interval = 2, previous_send_time = 0, delay = -0.1) and not False:
+                    previous_send_time = time.time()
+                    UAV1_packet = data_u2u.pack_SEAD_packet(sdpso.start, sdpso.target)
+                    xbee.sned_data_broadcast(UAV1_packet)
+            ' Receive the information of UAVs after Tcomm seconds '
+            if new_timer.check_period(0.5, previous_send_time) and UAV1_packet:
+                if update:
+                    sdpso.start[0,2:4] = data_u2u.uavs_info[1]
+                    sdpso.target[0,2:4] = data_u2u.uavs_info[2]
+                    update = False
+                else:
+                    print('no data to exchange')
+
+                    
+
             v = np.array([0,0,0,0])
             path_1, path_2, h, d_total, cost = generate_path(sdpso.start, sdpso.target, v)
             path_1, path_2 = smooth_path(path_1, path_2)
