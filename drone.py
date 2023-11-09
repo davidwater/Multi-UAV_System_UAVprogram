@@ -30,6 +30,7 @@ class Drone(object):
         self.battery_volt, self.battery_perc = 0, 0
         self.home = [0, 0, 0]
         self.frame_type = None
+        self.heading = 0
         while not self.frame_type:
             self.uav_classifier()
         rospy.Subscriber("/mavros/state", State, self.state_callback)
@@ -122,7 +123,7 @@ class Drone(object):
         rospy.wait_for_service("/mavros/cmd/takeoff")
         try:
             cmd_takeoff = rospy.ServiceProxy("/mavros/cmd/takeoff", CommandTOL)
-            responce = cmd_takeoff(altitude=alt, latitude=0, longitude=0, min_pitch=0, yaw=PlusMinusPi((90 - self.heading)*pi/180))
+            responce = cmd_takeoff(altitude=alt, latitude=0, longitude=0, min_pitch=0, yaw=PlusMinusPi((90 - self.yaw)*pi/180))
             return responce.success
         except rospy.ServiceException as e:
             return False

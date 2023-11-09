@@ -259,14 +259,18 @@ class packet_processing(object):
 
                 xs1 = unpack('i', packet[6:10])[0] * 1e-3 # xs1
                 ys1 = unpack('i', packet[10:14])[0] * 1e-3 # ys1
-                xs2 = unpack('i', packet[14:18])[0] * 1e-3 # xs2
-                ys2 = unpack('i', packet[18:22])[0] * 1e-3 # ys2
+                hs1  = unpack('i', packet[14:18])[0] * 1e-3 # start heading 1
+                xg1 = unpack('i', packet[18:22])[0] * 1e-3 # xg1
+                yg1 = unpack('i', packet[22:26])[0] * 1e-3 # yg2
+                hg1  = unpack('i', packet[26:30])[0] * 1e-3 # final heading 1
 
-                xg1 = unpack('i', packet[22:26])[0] * 1e-3 # xg1
-                yg1 = unpack('i', packet[26:30])[0] * 1e-3 # yg2
-                xg2 = unpack('i', packet[30:34])[0] * 1e-3 # xg2
-                yg2 = unpack('i', packet[34:38])[0] * 1e-3 # yg2
-            return Message_ID.SDPSO, [[uav_type, Rmin], np.array([[xs1, ys1, xs2, ys2], [xg1, yg1, xg2, yg2]])]
+                xs2 = unpack('i', packet[30:34])[0] * 1e-3 # xs2
+                ys2 = unpack('i', packet[34:38])[0] * 1e-3 # ys2
+                hs2  = unpack('i', packet[38:42])[0] * 1e-3 # start heading 2
+                xg2 = unpack('i', packet[42:46])[0] * 1e-3 # xg2
+                yg2 = unpack('i', packet[46:52])[0] * 1e-3 # yg2
+                hg2  = unpack('i', packet[52:56])[0] * 1e-3 # final heading 2
+            return Message_ID.SDPSO, [[Rmin], np.array([[xs1, ys1, xs2, ys2], [xg1, yg1, xg2, yg2]])]
         else:
             return Message_ID.info, "Wrong UAV for SDPSO"          
 
