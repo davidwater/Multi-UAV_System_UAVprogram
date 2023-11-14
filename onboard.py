@@ -204,8 +204,12 @@ if __name__ == "__main__":
                     Mission = Message_ID.SDPSO
                     xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"received SDPSO mission", new_timer.t()))
                     UAV.Rmin = info[0,0]
-                    sdpso.start[0,0:2] = np.array([[info[1][0,0], info[1][0,1]]])
-                    sdpso.target[0,0:2] = np.array([[info[1][1,0], info[1][1,1]]])
+                    if uav_id == XBee_Devices.UAV1:
+                        sdpso.start[0,0:2] = np.array([[info[1][0,0], info[1][0,1]]])
+                        sdpso.target[0,0:2] = np.array([[info[1][1,0], info[1][1,1]]])
+                    elif uav_id == XBee_Devices.UAV2:
+                        sdpso.start[0,2:4] = np.array([[info[1][0,0], info[1][0,1]]])
+                        sdpso.target[0,2:4] = np.array([[info[1][1,0], info[1][1,1]]])
                     completed = False                
                 
                 elif messageType == Message_ID.Mission_Abort:
@@ -298,10 +302,13 @@ if __name__ == "__main__":
         elif Mission == Message_ID.SDPSO:
             data_u2u = packet_processing(uav_id)
             update = True
+            previous_time_u2u = time.time()
+            sdpso.start[] = 
+            sdpso.target[] = 
             ' Broadcast every T seceods'
             if new_timer.check_timer(interval = 2, previous_send_time = 0, delay = -0.1) and not False:
                     previous_time_u2u = time.time()
-                    UAV1_packet = data_u2u.pack_SEAD_packet(sdpso.start, sdpso.target)
+                    UAV1_packet = data_u2u.pack_SDPSO_packet(sdpso.start, sdpso.target)
                     xbee.send_data_broadcast(UAV1_packet)
             ' Receive the information of UAVs after Tcomm seconds '
             if new_timer.check_period(0.5, previous_time_u2u) and UAV1_packet:
@@ -312,11 +319,11 @@ if __name__ == "__main__":
                 else:
                     print('no data to exchange')
 
-            v = np.array([0,0,0,0])
+            v = np.matrix([0,0,0,0])
             path_1, path_2, h, d_total, cost = generate_path(sdpso.start, sdpso.target, v)
             path_1, path_2 = smooth_path(path_1, path_2)
             UAV.v = 3
-            print('SDPSOiteration finish')
+            print('SDPSO iteration finish')
 
             if uav_id == XBee_Devices.UAV1:
                 tracking1 = CraigReynolds_Path_Following(path = path_1, path_window = 3, Kp = 1, Kd = 5)
