@@ -316,6 +316,7 @@ if __name__ == "__main__":
             path_1, path_2, h, d_total, cost = generate_path(sdpso.start, sdpso.target, v)
             path_1, path_2 = smooth_path(path_1, path_2)
             UAV.v = 3
+            print('SDPSOiteration finish')
 
             if uav_id == XBee_Devices.UAV1:
                 tracking1 = CraigReynolds_Path_Following(path = path_1, path_window = 3, Kp = 1, Kd = 5)
