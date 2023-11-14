@@ -378,8 +378,8 @@ def plot_path(it, x1, y1, x2, y2):
     return None
 
 def generate_path(start, target, v):
-    path_1 = np.array([[xs1, ys1]])
-    path_2 = np.array([[xs2, ys2]])
+    path_1 = np.array([[start[0,0], start[0,1]]])
+    path_2 = np.array([[start[0,2], start[0,3]]])
     h1 = heading(xn=start[0,0], target_xn=target[0,0], yn=start[0,1], target_yn=target[0,1])
     h2 = heading(xn=start[0,2], target_xn=target[0,2], yn=start[0,3], target_yn=target[0,3])
     # avoid special case i.e. heading angle = 45*n degree
@@ -415,7 +415,7 @@ def generate_path(start, target, v):
         path_2_y = np.round(path_2[it,1] + wvy2*dt, 4)
         path_1 = np.append(path_1, [[path_1_x, path_1_y]], axis = 0)
         path_2 = np.append(path_2, [[path_2_x, path_2_y]], axis = 0)
-        # print(f'iteration: {it+1}, UAV1_x: {path_1[it+1, 0]}, UAV1_y: {path_1[it+1, 1]}, UAV2_x: {path_2[it+1, 0]}, UAV2_y: {path_2[it+1, 1]}, cost: {cost[it+1]}')
+        #print(f'iteration: {it+1}, UAV1_x: {path_1[it+1, 0]}, UAV1_y: {path_1[it+1, 1]}, UAV2_x: {path_2[it+1, 0]}, UAV2_y: {path_2[it+1, 1]}, cost: {cost[it+1]}')
         # update heading
         h1_ = heading(path_1_x, target[0,0], path_1_y, target[0,1])
         h2_ = heading(path_2_x, target[0,2], path_2_y, target[0,3])
@@ -448,8 +448,8 @@ def smooth_path(path_1, path_2):
     path_1 = path_1[path_1[:,0].argsort()]
     path_2 = path_2[path_2[:,0].argsort()]
 
-    s_1 = path_1.shape[0] - 4 * math.sqrt(2 * path_1.shape[0])
-    s_2 = path_2.shape[0] - 4 * math.sqrt(2 * path_2.shape[0])
+    s_1 = path_1.shape[0] - 2 * math.sqrt(2 * path_1.shape[0])
+    s_2 = path_2.shape[0] - 2 * math.sqrt(2 * path_2.shape[0])
 
     # spline regression
     tck_1 = splrep(path_1[:,0], path_1[:,1], s = s_1)
@@ -463,8 +463,8 @@ def smooth_path(path_1, path_2):
 if __name__ == "__main__":
     # initial parameters
     xv1 = 0; yv1 = 0; xv2 = 0; yv2 = 0
-    xs1 = -40; ys1 = -40; xg1 = 40; yg1 = 40
-    xs2 = 40; ys2 = 40; xg2 = -40; yg2 = -40
+    xs1 = -200; ys1 = 10; xg1 = -150; yg1 = 100
+    xs2 = -150; ys2 = 100; xg2 = -200; yg2 = 10
     v = np.matrix([xv1, yv1, xv2, yv2])
     start = np.matrix([xs1, ys1, xs2, ys2])
     target = np.matrix([xg1, yg1, xg2, yg2])
@@ -475,13 +475,13 @@ if __name__ == "__main__":
     path_1 = path_1[path_1[:,0].argsort()]
     path_2 = path_2[path_2[:,0].argsort()]
 
-    s_1 = path_1.shape[0] - 4 * math.sqrt(2 * path_1.shape[0])
-    s_2 = path_2.shape[0] - 4 * math.sqrt(2 * path_2.shape[0])
+    s_1 = path_1.shape[0] - 1 * math.sqrt(2 * path_1.shape[0])
+    s_2 = path_2.shape[0] - 1 * math.sqrt(2 * path_2.shape[0])
     it = cost.shape[0]
 
     # spline regression
-    tck_1 = splrep(path_1[:,0], path_1[:,1], s = s_1)
-    tck_2 = splrep(path_2[:,0], path_2[:,1], s = s_2)
+    tck_1 = splrep(path_1[:,0], path_1[:,1], s = path_1.shape[0])
+    tck_2 = splrep(path_2[:,0], path_2[:,1], s = path_2.shape[0])
     plt.scatter(path_1[:,0], path_1[:,1], color = 'red', s=1, label = 'UAV 1')
     plt.scatter(path_2[:,0], path_2[:,1], color = 'blue', s=1, label = 'UAV 2')
     plt.plot(path_1[:,0], BSpline(*tck_1)(path_1[:,0]), label = 'UAV 1 spline')
