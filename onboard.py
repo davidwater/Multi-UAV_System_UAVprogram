@@ -303,8 +303,12 @@ if __name__ == "__main__":
             data_u2u = packet_processing(uav_id)
             update = True
             previous_time_u2u = time.time()
-            sdpso.start[] = 
-            sdpso.target[] = 
+            if uav_id == XBee_Devices.UAV1:
+                sdpso.start[0,2:4] = np.array([-150,100]) 
+                sdpso.target[0,2:4] = np.array([-200,10])  
+            elif uav_id == XBee_Devices.UAV1:
+                sdpso.start[0,0:2] = np.array([-200,10])
+                sdpso.target[0,0:2] = np.array([-150,100]) 
             ' Broadcast every T seceods'
             if new_timer.check_timer(interval = 2, previous_send_time = 0, delay = -0.1) and not False:
                     previous_time_u2u = time.time()
