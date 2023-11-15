@@ -46,8 +46,8 @@ class CraigReynolds_Path_Following(object):
                 d_optimal = d
                 desirePoint = normalPoint
                 direct_projection = np.dot(vb, desirePoint - np.array([x, y]))
-                index = i
-        return desirePoint, index, d_optimal, direct_projection
+                index_ = i
+        return desirePoint, index_, d_optimal, direct_projection
     
 
     def get_desirePoint(self, v, x, y, theta):

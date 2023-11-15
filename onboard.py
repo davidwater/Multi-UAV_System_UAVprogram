@@ -339,6 +339,7 @@ if __name__ == "__main__":
                 if error_of_distance <= 0 and completed:
                     target_V, u = 0, 0
                     UAV.set_mode(Mode.POSHOLD.name)
+                    xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV1 set to POSHOLD!", new_timer.t()))
                 else:
                     target_V = UAV.v
                 v_z = 0.3 * (height - UAV.local_pose[2])  # altitude hold
@@ -355,6 +356,7 @@ if __name__ == "__main__":
                 if error_of_distance <= 0 and completed:
                     target_V, u = 0, 0
                     UAV.set_mode(Mode.POSHOLD.name)
+                    xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV2 set to POSHOLD!", new_timer.t()))
                 else:
                     target_V = UAV.v
                 v_z = 0.3 * (height - UAV.local_pose[2])  # altitude hold
