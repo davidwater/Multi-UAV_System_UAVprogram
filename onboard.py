@@ -204,10 +204,10 @@ if __name__ == "__main__":
                     Mission = Message_ID.SDPSO
                     xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"received SDPSO mission", new_timer.t()))
                     UAV.Rmin = info[0,0]
-                    if uav_id == XBee_Devices.UAV1:
+                    if uav_id == 1:
                         sdpso.start[0,0:2] = np.array([[info[1][0,0], info[1][0,1]]])
                         sdpso.target[0,0:2] = np.array([[info[1][1,0], info[1][1,1]]])
-                    elif uav_id == XBee_Devices.UAV2:
+                    elif uav_id ==  2:
                         sdpso.start[0,2:4] = np.array([[info[1][0,0], info[1][0,1]]])
                         sdpso.target[0,2:4] = np.array([[info[1][1,0], info[1][1,1]]])
                     completed = False                
@@ -303,10 +303,10 @@ if __name__ == "__main__":
             data_u2u = packet_processing(uav_id)
             update = True
             previous_time_u2u = time.time()
-            if uav_id == XBee_Devices.UAV1:
+            if uav_id == 1:
                 sdpso.start[0,2:4] = np.array([-150,100]) 
                 sdpso.target[0,2:4] = np.array([-200,10])  
-            elif uav_id == XBee_Devices.UAV1:
+            elif uav_id == 2:
                 sdpso.start[0,0:2] = np.array([-200,10])
                 sdpso.target[0,0:2] = np.array([-150,100]) 
             ' Broadcast every T seceods'
@@ -329,7 +329,7 @@ if __name__ == "__main__":
             UAV.v = 3
             print('SDPSO iteration finish')
 
-            if uav_id == XBee_Devices.UAV1:
+            if uav_id == 1:
                 tracking1 = CraigReynolds_Path_Following(path = path_1, path_window = 3, Kp = 1, Kd = 5)
                 desirePoint, index, _, error_of_distance = tracking1.get_desirePoint_withWindow(UAV.v, UAV.local_pose[0], UAV.local_pose[1], UAV.yaw, index)
                 u, pre_error = tracking1.PID_control(UAV.v, UAV.Rmin, UAV.local_pose, UAV.yaw, desirePoint, pre_error)
@@ -345,7 +345,7 @@ if __name__ == "__main__":
                     xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV1 SDPSO mission completed!", new_timer.t()))
                     completed = True
 
-            elif uav_id == XBee_Devices.UAV2:
+            elif uav_id == 2:
                 tracking2 = CraigReynolds_Path_Following(path = path_2, path_window = 3, Kp = 1, Kd = 5)
                 desirePoint, index, _, error_of_distance = tracking2.get_desirePoint_withWindow(UAV.v, UAV.local_pose[0], UAV.local_pose[1], UAV.yaw, index)
                 u, pre_error = tracking2.PID_control(UAV.v, UAV.Rmin, UAV.local_pose, UAV.yaw, desirePoint, pre_error)
