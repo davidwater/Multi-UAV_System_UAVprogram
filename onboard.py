@@ -202,6 +202,8 @@ if __name__ == "__main__":
                 elif messageType == Message_ID.SDPSO:
                     height = np.round(UAV.local_pose[2])
                     Mission = Message_ID.SDPSO
+                    completed = False       
+                    pre_error = None
                     xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"received SDPSO mission", new_timer.t()))
                     UAV.Rmin = info[0,0]
                     if uav_id == 1:
@@ -209,10 +211,7 @@ if __name__ == "__main__":
                         sdpso.target[0,0:2] = np.array([[info[1][1,0], info[1][1,1]]])
                     elif uav_id ==  2:
                         sdpso.start[0,2:4] = np.array([[info[1][0,0], info[1][0,1]]])
-                        sdpso.target[0,2:4] = np.array([[info[1][1,0], info[1][1,1]]])
-                        
-                    completed = False       
-                    pre_error = None         
+                        sdpso.target[0,2:4] = np.array([[info[1][1,0], info[1][1,1]]])         
                 
                 elif messageType == Message_ID.Mission_Abort:
                     Mission = Message_ID.Mission_Abort
