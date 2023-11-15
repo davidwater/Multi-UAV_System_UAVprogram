@@ -204,6 +204,7 @@ if __name__ == "__main__":
                     Mission = Message_ID.SDPSO
                     completed = False       
                     pre_error = None
+                    index = 0
                     xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"received SDPSO mission", new_timer.t()))
                     UAV.Rmin = info[0,0]
                     if uav_id == 1:
