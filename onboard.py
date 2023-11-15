@@ -210,6 +210,7 @@ if __name__ == "__main__":
                     elif uav_id ==  2:
                         sdpso.start[0,2:4] = np.array([[info[1][0,0], info[1][0,1]]])
                         sdpso.target[0,2:4] = np.array([[info[1][1,0], info[1][1,1]]])
+                        
                     completed = False       
                     pre_error = None         
                 
