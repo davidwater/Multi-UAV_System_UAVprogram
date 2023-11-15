@@ -328,9 +328,10 @@ if __name__ == "__main__":
             path_1, path_2 = smooth_path(path_1, path_2)
             UAV.v = 3
             print('SDPSO iteration finish')
+            xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} SDPSO iteration finish!", new_timer.t()))
 
             if uav_id == 1:
-                tracking1 = CraigReynolds_Path_Following(path = path_1, path_window = 3, Kp = 1, Kd = 5)
+                tracking1 = CraigReynolds_Path_Following(WaypointMissionMethod.CraigReynolds_Path_Following, 1, path = path_1, path_window = 3, Kp = 1, Kd = 5)
                 desirePoint, index, _, error_of_distance = tracking1.get_desirePoint_withWindow(UAV.v, UAV.local_pose[0], UAV.local_pose[1], UAV.yaw, index)
                 u, pre_error = tracking1.PID_control(UAV.v, UAV.Rmin, UAV.local_pose, UAV.yaw, desirePoint, pre_error)
                 if error_of_distance <= 0 and completed:
@@ -346,7 +347,7 @@ if __name__ == "__main__":
                     completed = True
 
             elif uav_id == 2:
-                tracking2 = CraigReynolds_Path_Following(path = path_2, path_window = 3, Kp = 1, Kd = 5)
+                tracking2 = CraigReynolds_Path_Following(WaypointMissionMethod.CraigReynolds_Path_Following, 1, path = path_2, path_window = 3, Kp = 1, Kd = 5)
                 desirePoint, index, _, error_of_distance = tracking2.get_desirePoint_withWindow(UAV.v, UAV.local_pose[0], UAV.local_pose[1], UAV.yaw, index)
                 u, pre_error = tracking2.PID_control(UAV.v, UAV.Rmin, UAV.local_pose, UAV.yaw, desirePoint, pre_error)
                 if error_of_distance <= 0 and completed:

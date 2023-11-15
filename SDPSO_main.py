@@ -29,9 +29,9 @@ class SDPSO(object):
         self.uav_position = []
         self.depots = []
         'SDPSO parameters'
-        self.MaxIt = 30       # Maximum Number of Iterations
-        self.nPop_max = 100    # Population Size (Swarm Size)
-        self.nPop_min = 50     # Population Size (Swarm Size)
+        self.MaxIt = 50       # Maximum Number of Iterations
+        self.nPop_max = 50    # Population Size (Swarm Size)
+        self.nPop_min = 30     # Population Size (Swarm Size)
         self.w = 1             # Inertia Weight
         self.wdamp = 0.99      # Inertia Weight Damping Ratio
         self.c1 = 1.5          # Personal Learning Coefficient
@@ -393,7 +393,7 @@ def generate_path(start, target, v):
     ds = 10
     Varsize = 4
     it = 0
-    dt = 0.25    # update rate
+    dt = 0.5    # update rate
     d1 = 0      # UAV1 moving distance
     d2 = 0      # UAV2 moving distance
     d_total = 0 # total moving distance
@@ -440,6 +440,10 @@ def generate_path(start, target, v):
             # plot_path(it, np.array(path_1[:, 0]), np.array(path_1[:, 1]), np.array(path_2[:, 0]), np.array(path_2[:, 1]))
             # plt.show()
             break
+
+    print(f'Cost value = {cost[it]}')
+    print(f'Process time: {time.time() - start_time} (sec)')
+    print(f'total distance = {d_total}')
     
     return path_1, path_2, h, d_total, cost  
 
@@ -475,19 +479,12 @@ if __name__ == "__main__":
     path_1 = path_1[path_1[:,0].argsort()]
     path_2 = path_2[path_2[:,0].argsort()]
 
-    s_1 = path_1.shape[0] - 1 * math.sqrt(2 * path_1.shape[0])
-    s_2 = path_2.shape[0] - 1 * math.sqrt(2 * path_2.shape[0])
-    it = cost.shape[0]
-
     # spline regression
-    tck_1 = splrep(path_1[:,0], path_1[:,1], s = path_1.shape[0])
-    tck_2 = splrep(path_2[:,0], path_2[:,1], s = path_2.shape[0])
+    tck_1 = splrep(path_1[:,0], path_1[:,1], s = path_1.shape[0] * 7)
+    tck_2 = splrep(path_2[:,0], path_2[:,1], s = path_2.shape[0] * 7)
     plt.scatter(path_1[:,0], path_1[:,1], color = 'red', s=1, label = 'UAV 1')
     plt.scatter(path_2[:,0], path_2[:,1], color = 'blue', s=1, label = 'UAV 2')
     plt.plot(path_1[:,0], BSpline(*tck_1)(path_1[:,0]), label = 'UAV 1 spline')
     plt.plot(path_2[:,0], BSpline(*tck_2)(path_2[:,0]), label = 'UAV 2 spline')
     plt.legend()
     plt.show()
-    print(f'Process time: {time.time() - start_time} (sec)')
-    print(f'Cost value = {cost[it]}')
-    print(f'total distance = {d_total}')
