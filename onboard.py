@@ -7,10 +7,13 @@ from time import time
 import rospy
 import multiprocessing as mp
 import DPGA
-from SDPSO_main import *
-
-
+from two_UAV_SDPSO_main import *
+import signal
+import sys
 t = time.time
+
+def signal_handler(signal, frame):
+    sys.exit(0)
 
 class Timer(object):
     def __init__(self):
@@ -18,6 +21,7 @@ class Timer(object):
         self.t1, self.t2, self.t3, self.t4 = None, None, None, None
 
     def t(self):
+        print(t() + self.bias)
         return t() + self.bias
 
     def check_timer(self, interval, previous_send_time, delay=0):
@@ -202,6 +206,7 @@ if __name__ == "__main__":
                 elif messageType == Message_ID.SDPSO:
                     height = np.round(UAV.local_pose[2])
                     Mission = Message_ID.SDPSO
+                    back_to_base = False
                     completed = False       
                     pre_error = None
                     index = 0
@@ -312,7 +317,8 @@ if __name__ == "__main__":
                 sdpso.start[0,0:2] = np.array([-200,10])
                 sdpso.target[0,0:2] = np.array([-150,100]) 
             ' Broadcast every T seceods'
-            if new_timer.check_timer(interval = 2, previous_send_time = 0, delay = -0.1) and not False:
+            new_timer.t()
+            if new_timer.check_timer(interval = 2, previous_send_time = 0, delay = -0.1) and not back_to_base:
                     previous_time_u2u = time.time()
                     UAV1_packet = data_u2u.pack_SDPSO_packet(sdpso.start, sdpso.target)
                     xbee.send_data_broadcast(UAV1_packet)
@@ -322,6 +328,7 @@ if __name__ == "__main__":
                     sdpso.start[0,2:4] = data_u2u.uavs_info[1]
                     sdpso.target[0,2:4] = data_u2u.uavs_info[2]
                     update = False
+                    print('data exchange!')
                 else:
                     print('no data to exchange')
 
@@ -348,6 +355,7 @@ if __name__ == "__main__":
                 if np.linalg.norm(path_1[-1][:2] - np.array(UAV.local_pose[:2])) <= waypoint_radius and not completed:
                     xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV1 SDPSO mission completed!", new_timer.t()))
                     completed = True
+                    back_to_base = True
 
             elif uav_id == 2:
                 tracking2 = CraigReynolds_Path_Following(WaypointMissionMethod.CraigReynolds_Path_Following, 1, path = path_2, path_window = 3, Kp = 1, Kd = 5)
@@ -378,6 +386,6 @@ if __name__ == "__main__":
         ' Mission cancal mechanism '
         if UAV.mode in stop_mode:
             Mission = Message_ID.Default
-
+    signal.signal(signal.SIGINT, signal_handler)
     xbee.send_data_async(gcs_address, data.pack_info_packet(f"rospy is shutdown!!"))
  
