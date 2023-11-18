@@ -21,7 +21,8 @@ class Timer(object):
         self.t1, self.t2, self.t3, self.t4 = None, None, None, None
 
     def t(self):
-        print(t() + self.bias)
+        print(f'current time: {t() + self.bias}')
+        print(f'time gap: {int((t() + self.bias + delay) * 10) % int(interval * 10) == 0}')
         return t() + self.bias
 
     def check_timer(self, interval, previous_send_time, delay=0):
