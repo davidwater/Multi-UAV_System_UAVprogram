@@ -113,7 +113,7 @@ if __name__ == "__main__":
             packet = xbee.read_data(timeout=1e-5)
             if packet:
                 messageType, info = data.unpack_packet(packet.data)
-                print(messageType, info, new_timer.t())
+                print(messageType, info)
                 if messageType == Message_ID.Mode_Change:
                     success = UAV.set_mode(info.name)
 
