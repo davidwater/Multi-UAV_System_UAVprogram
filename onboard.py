@@ -349,17 +349,17 @@ if __name__ == "__main__":
                         xbee.send_data_broadcast(UAV1_packet)
                         print('UAV1 publish data')
 
-                    # Receive the information of UAVs after Tcomm seconds
-                    if new_timer.check_period(0.5, previous_time_u2u) and UAV1_packet:
-                        if update:
-                            sdpso.start[0,2:4] = data_u2u.uavs_info[1]
-                            sdpso.target[0,2:4] = data_u2u.uavs_info[2]
-                            update = False
-                            print('data exchange!')
-                            break
-                        else:
-                            print('no data to exchange')
-                            break
+                        # Receive the information of UAVs after Tcomm seconds
+                        if new_timer.check_period(0.5, previous_time_u2u) and UAV1_packet:
+                            if update:
+                                sdpso.start[0,2:4] = data_u2u.uavs_info[1]
+                                sdpso.target[0,2:4] = data_u2u.uavs_info[2]
+                                update = False
+                                print('data exchange!')
+                                break
+                            else:
+                                print('no data to exchange')
+                                break
 
                 if np.linalg.norm(path_1[-1][:2] - np.array(UAV.local_pose[:2])) <= waypoint_radius and not completed:
                     xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV1 SDPSO mission completed!", new_timer.t()))
@@ -387,17 +387,17 @@ if __name__ == "__main__":
                         xbee.send_data_broadcast(UAV2_packet)
                         print('UAV2 publish data')
 
-                    # Receive the information of UAVs after Tcomm seconds
-                    if new_timer.check_period(0.5, previous_time_u2u) and UAV2_packet:
-                        if update:
-                            sdpso.start[0,0:2] = data_u2u.uavs_info[1]
-                            sdpso.target[0,0:2] = data_u2u.uavs_info[2]
-                            update = False
-                            print('data exchange!')
-                            break
-                        else:
-                            print('no data to exchange')
-                            break
+                        # Receive the information of UAVs after Tcomm seconds
+                        if new_timer.check_period(0.5, previous_time_u2u) and UAV2_packet:
+                            if update:
+                                sdpso.start[0,0:2] = data_u2u.uavs_info[1]
+                                sdpso.target[0,0:2] = data_u2u.uavs_info[2]
+                                update = False
+                                print('data exchange!')
+                                break
+                            else:
+                                print('no data to exchange')
+                                break
 
                 if np.linalg.norm(path_2[-1][:2] - np.array(UAV.local_pose[:2])) <= waypoint_radius and not completed:
                     xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV2 SDPSO mission completed!", new_timer.t()))
