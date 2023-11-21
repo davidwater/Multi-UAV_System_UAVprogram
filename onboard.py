@@ -324,7 +324,7 @@ if __name__ == "__main__":
             ' Broadcast every T seceods'
             new_timer.t()
             if uav_id ==1:
-                if new_timer.check_timer(interval = 2, previous_send_time = previous_time_u2u, delay = -0.1) and not back_to_base:
+                if new_timer.check_timer(u2u_interval, previous_time_u2u, delay = -0.1) and not back_to_base:
                     print('ok')
                     previous_time_u2u = time.time()
                     UAV1_packet = data_u2u.pack_SDPSO_packet(sdpso.start, sdpso.target)
@@ -341,7 +341,9 @@ if __name__ == "__main__":
                             print('no data to exchange')
             
             if uav_id ==2:
-                if new_timer.check_timer(interval = 2, previous_send_time = previous_time_u2u, delay = -0.1) and not back_to_base:
+                print(new_timer.check_timer(u2u_interval, previous_time_u2u, delay = -0.1))
+                print(not back_to_base)
+                if new_timer.check_timer(u2u_interval, previous_time_u2u, delay = -0.1) and not back_to_base:
                     print('ok')
                     previous_time_u2u = time.time()
                     UAV2_packet = data_u2u.pack_SDPSO_packet(sdpso.start, sdpso.target)
