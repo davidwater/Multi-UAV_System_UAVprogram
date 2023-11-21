@@ -23,7 +23,7 @@ class Timer(object):
         self.delay = None
 
     def t(self):
-        sync
+        sync = False
         if int((t() + self.bias + self.delay) * 10) % int(self.interval * 10) == 0:
             print(f'time sychronization: {int((t() + self.bias + self.delay) * 10) % int(self.interval * 10) == 0}')
             sync = True
@@ -329,7 +329,7 @@ if __name__ == "__main__":
                 _, sync = new_timer.t()
                 if sync == True:
                     break
-                
+            
             if uav_id ==1:
                 if new_timer.check_timer(u2u_interval, previous_time_u2u, delay = -0.1) and not back_to_base:
                     print('ok')
