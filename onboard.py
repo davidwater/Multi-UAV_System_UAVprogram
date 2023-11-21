@@ -348,8 +348,7 @@ if __name__ == "__main__":
                             print('no data to exchange')
             
             if uav_id ==2:
-                print(new_timer.check_timer(u2u_interval, previous_time_u2u, delay = -0.1))
-                print(not back_to_base)
+                print(new_timer.check_timer(u2u_interval, previous_time_u2u, delay = -0.1), ((t() + self.bias + delay) * 10) % int(interval * 10), t() - previous_send_time)
                 if new_timer.check_timer(u2u_interval, previous_time_u2u, delay = -0.1) and not back_to_base:
                     print('ok')
                     previous_time_u2u = time.time()
