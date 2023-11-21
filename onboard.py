@@ -350,6 +350,7 @@ if __name__ == "__main__":
                                 previous_time_u2u = time.time()
                                 UAV1_packet = data_u2u.pack_SDPSO_packet(sdpso.start, sdpso.target)
                                 xbee.send_data_broadcast(UAV1_packet)
+                                print(UAV1_packet)
                                 print('UAV1 publish data')
 
                                 # Receive the information of UAVs after Tcomm seconds
@@ -391,6 +392,7 @@ if __name__ == "__main__":
                                 previous_time_u2u = time.time()
                                 UAV2_packet = data_u2u.pack_SDPSO_packet(sdpso.start, sdpso.target)
                                 xbee.send_data_broadcast(UAV2_packet)
+                                print(UAV2_packet)
                                 print('UAV2 publish data')
 
                                 # Receive the information of UAVs after Tcomm seconds
