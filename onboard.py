@@ -31,7 +31,7 @@ class Timer(object):
         '''
         sycronized communication (metrics: transmission frequency)
         '''
-        if int((t() + self.bias + delay) * 10) % int(interval * 10) == 0 and t() - previous_send_time >= interval/1.01:
+        if (int((t() + self.bias + delay) * 10) % int(interval * 10) == 0) and (t() - previous_send_time >= interval/1.01):
             return True
         else:
             return False
@@ -343,6 +343,7 @@ if __name__ == "__main__":
                 v_z = 0.3 * (height - UAV.local_pose[2])  # altitude hold
                 UAV.velocity_bodyFrame_control(target_V, u, v_z)
                 while True:
+                    print('chk')
                     if new_timer.check_timer(u2u_interval, previous_time_u2u, delay = -0.1) and not back_to_base:
                         previous_time_u2u = time.time()
                         UAV1_packet = data_u2u.pack_SDPSO_packet(sdpso.start, sdpso.target)
