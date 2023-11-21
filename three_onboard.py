@@ -7,7 +7,7 @@ from time import time
 import rospy
 import multiprocessing as mp
 import DPGA
-from two_UAV_SDPSO_main import *
+from three_UAV_SDPSO_main import *
 import signal
 import sys
 t = time.time
@@ -85,7 +85,7 @@ if __name__ == "__main__":
     ' => ROS connection '
     rospy.init_node('drone', anonymous=True)    
     UAV = Drone()
-    sdpso = SDPSO(np.matrix([0,0,0,0]), np.matrix([0,0,0,0]), np.matrix([0,0,0,0]), np.matrix([0,0]), np.array([0,0]), np.array([0,0]), it = 0, ds = 10, Varsize = 4)
+    sdpso = SDPSO(np.matrix([0,0,0,0,0,0]), np.matrix([0,0,0,0,0,0]), np.matrix([0,0,0,0,0,0]), np.matrix([0,0,0]), np.array([0,0]), np.array([0,0]), np.array([0,0]), it = 0, ds = 10, Varsize = 4)
     
     ' => Communication setting '
     data = packet_processing(uav_id)
@@ -222,7 +222,10 @@ if __name__ == "__main__":
                         sdpso.target[0,0:2] = np.array([[info[1][1,0], info[1][1,1]]])
                     elif uav_id ==  2:
                         sdpso.start[0,2:4] = np.array([[info[1][0,0], info[1][0,1]]])
-                        sdpso.target[0,2:4] = np.array([[info[1][1,0], info[1][1,1]]])         
+                        sdpso.target[0,2:4] = np.array([[info[1][1,0], info[1][1,1]]])
+                    elif uav_id ==  3:
+                        sdpso.start[0,4:6] = np.array([[info[1][0,0], info[1][0,1]]])
+                        sdpso.target[0,4:6] = np.array([[info[1][1,0], info[1][1,1]]]) 
                 
                 elif messageType == Message_ID.Mission_Abort:
                     Mission = Message_ID.Mission_Abort
@@ -314,16 +317,25 @@ if __name__ == "__main__":
         elif Mission == Message_ID.SDPSO:
             data_u2u = packet_processing(uav_id)
             update = True
-            previous_time_u2u = 0
+            previous_time_u2u = time.time()
             if uav_id == 1:
-                sdpso.start[0,2:4] = np.array([-150,100]) 
-                sdpso.target[0,2:4] = np.array([-200,10])  
+                sdpso.start[0,2:4] = np.array([-150,10])
+                sdpso.start[0,4:6] = np.array([-175,10])  
+                sdpso.target[0,2:4] = np.array([-200,100])  
+                sdpso.target[0,4:6] = np.array([-175,100])  
             elif uav_id == 2:
                 sdpso.start[0,0:2] = np.array([-200,10])
-                sdpso.target[0,0:2] = np.array([-150,100]) 
+                sdpso.start[0,4:6] = np.array([-175,10]) 
+                sdpso.target[0,0:2] = np.array([-150,100])
+                sdpso.target[0,4:6] = np.array([-175,100]) 
+            elif uav_id == 3:
+                sdpso.start[0,0:2] = np.array([-200,10])
+                sdpso.start[0,2:4] = np.array([-150,10])
+                sdpso.target[0,0:2] = np.array([-150,100])
+                sdpso.target[0,2:4] = np.array([-200,100])   
             ' Broadcast every T seceods'
             new_timer.t()
-            if new_timer.check_timer(interval = 2, previous_send_time = previous_time_u2u, delay = -0.1) and not back_to_base:
+            if new_timer.check_timer(interval = 2, previous_send_time = 0, delay = -0.1) and not back_to_base:
                     previous_time_u2u = time.time()
                     UAV1_packet = data_u2u.pack_SDPSO_packet(sdpso.start, sdpso.target)
                     xbee.send_data_broadcast(UAV1_packet)
@@ -337,9 +349,9 @@ if __name__ == "__main__":
                 else:
                     print('no data to exchange')
 
-            v = np.matrix([0,0,0,0])
-            path_1, path_2, h, d_total, cost = generate_path(sdpso.start, sdpso.target, v)
-            path_1, path_2 = smooth_path(path_1, path_2)
+            v = np.matrix([0,0,0,0,0,0])
+            path_1, path_2, path_3, h, d_total, cost = generate_path(sdpso.start, sdpso.target, v)
+            path_1, path_2, path_3 = smooth_path(path_1, path_2, path_3)
             UAV.v = 3
             print('SDPSO iteration finish')
             xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} SDPSO iteration finish!", new_timer.t()))
@@ -377,6 +389,23 @@ if __name__ == "__main__":
 
                 if np.linalg.norm(path_2[-1][:2] - np.array(UAV.local_pose[:2])) <= waypoint_radius and not completed:
                     xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV2 SDPSO mission completed!", new_timer.t()))
+                    completed = True
+
+            elif uav_id == 3:
+                tracking3 = CraigReynolds_Path_Following(WaypointMissionMethod.CraigReynolds_Path_Following, 1, path = path_3, path_window = 3, Kp = 1, Kd = 5)
+                desirePoint, index, _, error_of_distance = tracking3.get_desirePoint_withWindow(UAV.v, UAV.local_pose[0], UAV.local_pose[1], UAV.yaw, index)
+                u, pre_error = tracking3.PID_control(UAV.v, UAV.Rmin, UAV.local_pose, UAV.yaw, desirePoint, pre_error)
+                if error_of_distance <= 0 and completed:
+                    target_V, u = 0, 0
+                    UAV.set_mode(Mode.POSHOLD.name)
+                    xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV3 set to POSHOLD!", new_timer.t()))
+                else:
+                    target_V = UAV.v
+                v_z = 0.3 * (height - UAV.local_pose[2])  # altitude hold
+                UAV.velocity_bodyFrame_control(target_V, u, v_z)
+
+                if np.linalg.norm(path_2[-1][:2] - np.array(UAV.local_pose[:2])) <= waypoint_radius and not completed:
+                    xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV3 SDPSO mission completed!", new_timer.t()))
                     completed = True
             
 

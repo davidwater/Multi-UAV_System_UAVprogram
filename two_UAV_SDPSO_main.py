@@ -29,9 +29,9 @@ class SDPSO(object):
         self.uav_position = []
         self.depots = []
         'SDPSO parameters'
-        self.MaxIt = 50       # Maximum Number of Iterations
+        self.MaxIt = 80       # Maximum Number of Iterations
         self.nPop_max = 100    # Population Size (Swarm Size)
-        self.nPop_min = 30     # Population Size (Swarm Size)
+        self.nPop_min = 50     # Population Size (Swarm Size)
         self.w = 1             # Inertia Weight
         self.wdamp = 0.99      # Inertia Weight Damping Ratio
         self.c1 = 1.5          # Personal Learning Coefficient
@@ -42,23 +42,23 @@ class SDPSO(object):
         'simulated annealing (SA) parameters'
         self.p = 0             # initial probability of a suboptimal solution being accepted
         self.rand = np.random.rand()
-        self.T = 1             # temperature of current system (T=1)
+        self.T = 90             # temperature of current system (T=1)
         'acceleration of convergence based on dimensional learning strategy (DLS)' 
         self.count = 0         # non-updating number
         self.m = 2             # Random threshold fo the acceleration of convergence
         'velocity limits'
         self.VelMax = 3
-        self.VelMin = -self.VelMax
+        self.VelMin = -3
         'pre-setup matrix for SDPSO'
         # individual particles
         self.Position = []                                                                           # nPop_max*4    
         self.Cost = np.empty([self.nPop_max, 4])                                                     # nPop_max*4 (cost_1, cost_2, cost_3, cost)
         self.Velocity =  []                                                                          # nPop_max*4
-        self.Best_Position = np.empty([self.nPop_max, Varsize])                                      # nPop_max*4
-        self.Best_Cost = np.empty([self.nPop_max, 1])                                                # nPop_max*1
+        self.Best_Position = np.empty([self.nPop_max, Varsize])                                      # personal best position (nPop_max*4) 
+        self.Best_Cost = np.empty([self.nPop_max, 1])                                                # personal best cost(nPop_max*1) 
         # global
-        self.GlobalBest_Cost = float('inf') # scalar
-        self.pre_GlobalBest_Cost = 0 # scalar
+        self.GlobalBest_Cost = float('inf')              # scalar
+        self.pre_GlobalBest_Cost = 0                     # scalar
         self.GlobalBest_Position = np.zeros([1,Varsize]) # 1*4
 
     def iteration(self):
@@ -66,7 +66,7 @@ class SDPSO(object):
         if math.sqrt((self.path_1[self.it,0] - self.path_2[self.it,0]) ** 2 + (self.path_1[self.it,1] - self.path_2[self.it,1]) ** 2) < self.ds:
             # initialization
             self.Position = np.random.uniform(self.VarMin, self.VarMax, [self.nPop_max, self.Varsize])  
-            self.Velocity = np.random.uniform(self.VarMin, self.VarMax, [self.nPop_max, self.Varsize])
+            self.Velocity = np.random.uniform(self.VelMin, self.VelMax, [self.nPop_max, self.Varsize])
             for i in range(self.nPop_max):
                 ax1 = self.Position[i,0]
                 ay1 = self.Position[i,1]
@@ -182,7 +182,6 @@ class SDPSO(object):
                             self.p = math.exp(-(self.GlobalBest_Cost - self.pre_GlobalBest_Cost)/self.T)
                         except:
                             self.p = math.inf
-                        self.rand = np.random.rand()
                         self.m = (j / self.MaxIt) * (self.VarMax - self.VarMin)
         # without collision potential
         else:
@@ -319,8 +318,9 @@ class SDPSO(object):
     def cal_cost_1(self, xn1, yn1, xn2, yn2):
         dist_1 = math.sqrt((xn1 - self.target[0,0]) ** 2 + (yn1 - self.target[0,1]) ** 2)
         dist_2 = math.sqrt((xn2 - self.target[0,2]) ** 2 + (yn2 - self.target[0,3]) ** 2)
-        coeff_pun = (dist_1 + dist_2) / (self.total_dist_1 + self.total_dist_2)
-        cost_1 = (dist_1 + dist_2) * coeff_pun
+        k = 1
+        coeff_pun = k * math.exp(1 / (dist_1 + dist_2))
+        cost_1 = ((dist_1 ** 2/self.total_dist_1) + (dist_2 ** 2/self.total_dist_2)) * coeff_pun
         return cost_1
     
     def cal_cost_2(self, xn1, yn1, xn2, yn2):
@@ -335,8 +335,8 @@ class SDPSO(object):
         return cost_2
     
     def cal_cost_3(self, theta_1, theta_1_old, theta_2, theta_2_old):
-        k = 100
-        theta_max = 2/math.pi
+        k = 150
+        theta_max = math.pi/3
         coeff_pun_1 = k * math.exp(-(((theta_1 - theta_1_old)/theta_max) ** 2))
         coeff_pun_2 = k * math.exp(-(((theta_2 - theta_2_old)/theta_max) ** 2))
         
@@ -397,22 +397,22 @@ def generate_path(start, target, v):
     d1 = 0      # UAV1 moving distance
     d2 = 0      # UAV2 moving distance
     d_total = 0 # total moving distance
-    df = 10    # acceptance distance
-    cost = np.zeros(1)   # cost value
+    df = 8    # acceptance distance
+    cost = []   # cost value
     
     for it in range (iteration):
         wypt = SDPSO(start, target, v, h, path_1, path_2, it, ds, Varsize)
         vxn1, vyn1, vxn2, vyn2, cost_ = wypt.iteration()
+        cost_ = np.round(cost_, 4)
         cost = np.append(cost, cost_, axis = 0)
-        cost = np.round(cost, 4)
         v = np.append(v, [[vxn1, vyn1, vxn2, vyn2]], axis = 0)
         # body frame to world frame
         wvx1, wvy1, wvx2, wvy2 = b2w(vxn1, vyn1, vxn2, vyn2, h[0,0], h[0,1])
         # world frame path
-        path_1_x = np.round(path_1[it,0] + wvx1*dt, 4)
-        path_1_y = np.round(path_1[it,1] + wvy1*dt, 4)
-        path_2_x = np.round(path_2[it,0] + wvx2*dt, 4)
-        path_2_y = np.round(path_2[it,1] + wvy2*dt, 4)
+        path_1_x = path_1[it,0] + wvx1*dt
+        path_1_y = path_1[it,1] + wvy1*dt
+        path_2_x = path_2[it,0] + wvx2*dt
+        path_2_y = path_2[it,1] + wvy2*dt
         path_1 = np.append(path_1, [[path_1_x, path_1_y]], axis = 0)
         path_2 = np.append(path_2, [[path_2_x, path_2_y]], axis = 0)
         #print(f'iteration: {it+1}, UAV1_x: {path_1[it+1, 0]}, UAV1_y: {path_1[it+1, 1]}, UAV2_x: {path_2[it+1, 0]}, UAV2_y: {path_2[it+1, 1]}, cost: {cost[it+1]}')
@@ -425,12 +425,7 @@ def generate_path(start, target, v):
             path_1[it+1, 0] += 0.01
         elif (h2_ == math.pi/4 or h2_ == 0.75*math.pi or h2_ == -math.pi/4 or h2_ == -0.75*math.pi):
             path_2[it+1, 0] += 0.01
-        # moving distance
-        d1 = math.sqrt((path_1[it+1, 0] - path_1[it, 0]) ** 2 + (path_1[it+1, 1] - path_1[it, 1]) ** 2)
-        d2 = math.sqrt((path_2[it+1, 0] - path_2[it, 0]) ** 2 + (path_2[it+1, 1] - path_2[it, 1]) ** 2)
-        d_total += (d1 + d2)
-        # plot_path(it, np.array(path_1[:, 0]), np.array(path_1[:, 1]), np.array(path_2[:, 0]), np.array(path_2[:, 1]))
-
+        
         # check if UAVs arrive goals
         if math.sqrt((path_1[it+1, 0] - target[0,0]) ** 2 + (path_1[it+1, 1] - target[0,1]) ** 2) < df and math.sqrt((path_2[it+1, 0] - target[0,2]) ** 2 + (path_2[it+1, 1] - target[0,3]) ** 2) < df:
             path_1[it+1, 0] = target[0,0]
@@ -440,6 +435,12 @@ def generate_path(start, target, v):
             # plot_path(it, np.array(path_1[:, 0]), np.array(path_1[:, 1]), np.array(path_2[:, 0]), np.array(path_2[:, 1]))
             # plt.show()
             break
+        # moving distance
+        d1 = math.sqrt((path_1[it+1, 0] - path_1[it, 0]) ** 2 + (path_1[it+1, 1] - path_1[it, 1]) ** 2)
+        d2 = math.sqrt((path_2[it+1, 0] - path_2[it, 0]) ** 2 + (path_2[it+1, 1] - path_2[it, 1]) ** 2)
+        d_total += (d1 + d2)
+        # plot_path(it, np.array(path_1[:, 0]), np.array(path_1[:, 1]), np.array(path_2[:, 0]), np.array(path_2[:, 1]))
+        # print(f'Iteration: {it}, Cost value = {cost[it]}')
 
     print(f'Cost value = {cost[it]}')
     print(f'Process time: {time.time() - start_time} (sec)')
@@ -480,10 +481,12 @@ if __name__ == "__main__":
     path_2 = path_2[path_2[:,0].argsort()]
 
     # spline regression
-    tck_1 = splrep(path_1[:,0], path_1[:,1], s = path_1.shape[0] * 2)
-    tck_2 = splrep(path_2[:,0], path_2[:,1], s = path_2.shape[0] * 2)
+    tck_1 = splrep(path_1[:,0], path_1[:,1], s = path_1.shape[0] * 0.01)
+    tck_2 = splrep(path_2[:,0], path_2[:,1], s = path_2.shape[0] * 0.01)
     plt.scatter(path_1[:,0], path_1[:,1], color = 'blue', s=1, label = 'UAV 1')
     plt.scatter(path_2[:,0], path_2[:,1], color = 'red', s=1, label = 'UAV 2')
+    # plt.plot(path_1[:,0], path_1[:,1], color = 'blue', label = 'UAV 1', ls = '-.')
+    # plt.plot(path_2[:,0], path_2[:,1], color = 'red', label = 'UAV 2', ls = '-.')
     plt.plot(path_1[:,0], BSpline(*tck_1)(path_1[:,0]), label = 'UAV 1 spline')
     plt.plot(path_2[:,0], BSpline(*tck_2)(path_2[:,0]), label = 'UAV 2 spline')
     plt.legend()
