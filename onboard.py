@@ -353,18 +353,18 @@ if __name__ == "__main__":
                                 print(UAV1_packet)
                                 print('UAV1 publish data')
 
-                            # Receive the information of UAVs after Tcomm seconds
-                            if new_timer.check_period(0.5, previous_time_u2u) and UAV1_packet:
-                                print('check')
-                                if update:
-                                    sdpso.start[0,2:4] = data_u2u.uavs_info[1]
-                                    sdpso.target[0,2:4] = data_u2u.uavs_info[2]
-                                    update = False
-                                    print('data exchange!')
-                                    break
-                                else:
-                                    print('no data to exchange')
-                                    break
+                                # Receive the information of UAVs after Tcomm seconds
+                                if new_timer.check_period(0.5, previous_time_u2u) and UAV1_packet:
+                                    print('check')
+                                    if update:
+                                        sdpso.start[0,2:4] = data_u2u.uavs_info[1]
+                                        sdpso.target[0,2:4] = data_u2u.uavs_info[2]
+                                        update = False
+                                        print('data exchange!')
+                                        break
+                                    else:
+                                        print('no data to exchange')
+                                        break
                         except KeyboardInterrupt:
                             break                     
 
@@ -396,18 +396,18 @@ if __name__ == "__main__":
                                 print(UAV2_packet)
                                 print('UAV2 publish data')
 
-                            # Receive the information of UAVs after Tcomm seconds
-                            if new_timer.check_period(0.5, previous_time_u2u) and UAV2_packet:
-                                print('check')
-                                if update:
-                                    sdpso.start[0,0:2] = data_u2u.uavs_info[1]
-                                    sdpso.target[0,0:2] = data_u2u.uavs_info[2]
-                                    update = False
-                                    print('data exchange!')
-                                    break
-                                else:
-                                    print('no data to exchange')
-                                    break
+                                # Receive the information of UAVs after Tcomm seconds
+                                if new_timer.check_period(0.5, previous_time_u2u) and UAV2_packet:
+                                    print('check')
+                                    if update:
+                                        sdpso.start[0,0:2] = data_u2u.uavs_info[1]
+                                        sdpso.target[0,0:2] = data_u2u.uavs_info[2]
+                                        update = False
+                                        print('data exchange!')
+                                        break
+                                    else:
+                                        print('no data to exchange')
+                                        break
                         except KeyboardInterrupt:
                             break
                         
