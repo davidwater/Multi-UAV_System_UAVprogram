@@ -23,11 +23,9 @@ class Timer(object):
         self.delay = None
 
     def t(self):
-        sync = False
         if int((t() + self.bias + self.delay) * 10) % int(self.interval * 10) == 0:
             print(f'time sychronization: {int((t() + self.bias + self.delay) * 10) % int(self.interval * 10) == 0}')
-            sync = True
-        return t() + self.bias, sync
+        return t() + self.bias
 
     def check_timer(self, interval, previous_send_time, delay=0):
         '''
@@ -324,13 +322,9 @@ if __name__ == "__main__":
                 sdpso.start[0,0:2] = np.array([-200,10])
                 sdpso.target[0,0:2] = np.array([-150,100]) 
             ' Broadcast every T seceods'
-            _, sync = new_timer.t()
-            while sync == False:
-                _, sync = new_timer.t()
-                if sync == True:
-                    break
-            
             if uav_id ==1:
+                while new_timer.check_timer(u2u_interval, previous_time_u2u, delay = -0.1):
+                    break
                 if new_timer.check_timer(u2u_interval, previous_time_u2u, delay = -0.1) and not back_to_base:
                     print('ok')
                     previous_time_u2u = time.time()
@@ -348,7 +342,8 @@ if __name__ == "__main__":
                             print('no data to exchange')
             
             if uav_id ==2:
-                print(new_timer.check_timer(u2u_interval, previous_time_u2u, delay = -0.1), t() - previous_time_u2u)
+                while new_timer.check_timer(u2u_interval, previous_time_u2u, delay = -0.1):
+                    break
                 if new_timer.check_timer(u2u_interval, previous_time_u2u, delay = -0.1) and not back_to_base:
                     print('ok')
                     previous_time_u2u = time.time()
