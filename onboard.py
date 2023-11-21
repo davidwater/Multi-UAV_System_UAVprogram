@@ -322,6 +322,7 @@ if __name__ == "__main__":
                 sdpso.start[0,0:2] = np.array([-200,10])
                 sdpso.target[0,0:2] = np.array([-150,100]) 
             ' Broadcast every T seceods'
+            new_timer.time_synchronize_process(gcs_address, xbee, uav_id)
             new_timer.t()
             if uav_id ==1:
                 if new_timer.check_timer(interval = 2, previous_send_time = previous_time_u2u, delay = -0.1) and not back_to_base:
@@ -344,7 +345,7 @@ if __name__ == "__main__":
                         UAV2_packet = data_u2u.pack_SDPSO_packet(sdpso.start, sdpso.target)
                         xbee.send_data_broadcast(UAV1_packet)
                 ' Receive the information of UAVs after Tcomm seconds '
-                if new_timer.check_period(0.5, previous_time_u2u) and UAV1_packet:
+                if new_timer.check_period(0.5, previous_time_u2u) and UAV2_packet:
                     if update:
                         sdpso.start[0,0:2] = data_u2u.uavs_info[1]
                         sdpso.target[0,0:2] = data_u2u.uavs_info[2]
