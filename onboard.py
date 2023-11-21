@@ -70,6 +70,7 @@ class Timer(object):
                         self.delay = ((self.t4 - self.t1) - (self.t3 - self.t2))/2
                         print(f"Bias: {self.bias}, t1:{self.t1}, t2:{self.t2}, t3:{self.t3}, t4:{self.t4}, delay:{((self.t4 - self.t1) - (self.t3 - self.t2))/2}")
                         print(f'time sychronization: {int((t() + self.bias + self.delay) * 10) % int(self.interval * 10) == 0}')
+                        print(f'time synchronization complete!')
                         break
                 except:
                     continue
@@ -323,36 +324,37 @@ if __name__ == "__main__":
                 sdpso.target[0,0:2] = np.array([-150,100]) 
             ' Broadcast every T seceods'
             new_timer.time_synchronize_process(gcs_address, xbee, uav_id)
-            new_timer.t()
             if uav_id ==1:
                 if new_timer.check_timer(interval = 2, previous_send_time = previous_time_u2u, delay = -0.1) and not back_to_base:
-                        previous_time_u2u = time.time()
-                        UAV1_packet = data_u2u.pack_SDPSO_packet(sdpso.start, sdpso.target)
-                        xbee.send_data_broadcast(UAV1_packet)
-                ' Receive the information of UAVs after Tcomm seconds '
-                if new_timer.check_period(0.5, previous_time_u2u) and UAV1_packet:
-                    if update:
-                        sdpso.start[0,2:4] = data_u2u.uavs_info[1]
-                        sdpso.target[0,2:4] = data_u2u.uavs_info[2]
-                        update = False
-                        print('data exchange!')
-                    else:
-                        print('no data to exchange')
+                    previous_time_u2u = time.time()
+                    UAV1_packet = data_u2u.pack_SDPSO_packet(sdpso.start, sdpso.target)
+                    xbee.send_data_broadcast(UAV1_packet)
+
+                    # Receive the information of UAVs after Tcomm seconds
+                    if new_timer.check_period(0.5, previous_time_u2u) and UAV1_packet:
+                        if update:
+                            sdpso.start[0,2:4] = data_u2u.uavs_info[1]
+                            sdpso.target[0,2:4] = data_u2u.uavs_info[2]
+                            update = False
+                            print('data exchange!')
+                        else:
+                            print('no data to exchange')
             
             if uav_id ==2:
                 if new_timer.check_timer(interval = 2, previous_send_time = previous_time_u2u, delay = -0.1) and not back_to_base:
-                        previous_time_u2u = time.time()
-                        UAV2_packet = data_u2u.pack_SDPSO_packet(sdpso.start, sdpso.target)
-                        xbee.send_data_broadcast(UAV1_packet)
-                ' Receive the information of UAVs after Tcomm seconds '
-                if new_timer.check_period(0.5, previous_time_u2u) and UAV2_packet:
-                    if update:
-                        sdpso.start[0,0:2] = data_u2u.uavs_info[1]
-                        sdpso.target[0,0:2] = data_u2u.uavs_info[2]
-                        update = False
-                        print('data exchange!')
-                    else:
-                        print('no data to exchange')
+                    previous_time_u2u = time.time()
+                    UAV2_packet = data_u2u.pack_SDPSO_packet(sdpso.start, sdpso.target)
+                    xbee.send_data_broadcast(UAV2_packet)
+
+                    # Receive the information of UAVs after Tcomm seconds
+                    if new_timer.check_period(0.5, previous_time_u2u) and UAV2_packet:
+                        if update:
+                            sdpso.start[0,0:2] = data_u2u.uavs_info[1]
+                            sdpso.target[0,0:2] = data_u2u.uavs_info[2]
+                            update = False
+                            print('data exchange!')
+                        else:
+                            print('no data to exchange')
 
             v = np.matrix([0,0,0,0])
             path_1, path_2, h, d_total, cost = generate_path(sdpso.start, sdpso.target, v)
