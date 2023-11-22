@@ -323,8 +323,7 @@ if __name__ == "__main__":
                     sdpso.start[0,0:2] = np.array([-200,10])
                     sdpso.target[0,0:2] = np.array([-150,100]) 
 
-                v = np.matrix([0,0,0,0])
-                path_1, path_2, h, d_total, cost = generate_path(sdpso.start, sdpso.target, v)
+                path_1, path_2, h, d_total, cost = generate_path(sdpso.start, sdpso.target, sdpso.v)
                 path_1, path_2 = smooth_path(path_1, path_2)
                 UAV.v = 3
                 print('SDPSO iteration finish')
@@ -348,18 +347,17 @@ if __name__ == "__main__":
                         try:
                             if new_timer.check_timer(u2u_interval, previous_time_u2u, delay = -0.1) and not back_to_base:
                                 previous_time_u2u = time.time()
-                                UAV1_packet = data_u2u.pack_SDPSO_packet(sdpso.start, sdpso.target)
+                                UAV1_packet = data_u2u.pack_SDPSO_packet(UAV.local_pose, UAV.local_velo)
                                 xbee.send_data_broadcast(UAV1_packet)
-                                print(UAV1_packet)
                                 print('UAV1 publish data')
 
                                 # Receive the information of UAVs after Tcomm seconds
-                                while UAV1_packet:
+                                while UAV2_packet:
                                     if new_timer.check_period(0.5, previous_time_u2u):
                                         print('check')
                                         if update:
-                                            sdpso.start[0,2:4] = data_u2u.uavs_info[1]
-                                            sdpso.target[0,2:4] = data_u2u.uavs_info[2]
+                                            sdpso.start[0,2:4] = data_u2u.uavs_info[1] * 1e-3
+                                            sdpso.v[0,2:4] = data_u2u.uavs_info[2] * 1e-3
                                             update = False
                                             print('data exchange!')
                                             break
@@ -392,18 +390,17 @@ if __name__ == "__main__":
                         try:
                             if new_timer.check_timer(u2u_interval, previous_time_u2u, delay = -0.1) and not back_to_base:
                                 previous_time_u2u = time.time()
-                                UAV2_packet = data_u2u.pack_SDPSO_packet(sdpso.start, sdpso.target)
+                                UAV2_packet = data_u2u.pack_SDPSO_packet(UAV.local_pose, UAV.local_velo)
                                 xbee.send_data_broadcast(UAV2_packet)
-                                print(UAV2_packet)
                                 print('UAV2 publish data')
 
                                 # Receive the information of UAVs after Tcomm seconds
-                                while UAV2_packet:
+                                while UAV1_packet:
                                     if new_timer.check_period(0.5, previous_time_u2u):
                                         print('check')
                                         if update:
-                                            sdpso.start[0,0:2] = data_u2u.uavs_info[1]
-                                            sdpso.target[0,0:2] = data_u2u.uavs_info[2]
+                                            sdpso.start[0,0:2] = data_u2u.uavs_info[1] * 1e-3
+                                            sdpso.v[0,0:2] = data_u2u.uavs_info[2] * 1e-3
                                             update = False
                                             print('data exchange!')
                                             break

@@ -349,8 +349,7 @@ if __name__ == "__main__":
                 else:
                     print('no data to exchange')
 
-            v = np.matrix([0,0,0,0,0,0])
-            path_1, path_2, path_3, h, d_total, cost = generate_path(sdpso.start, sdpso.target, v)
+            path_1, path_2, path_3, h, d_total, cost = generate_path(sdpso.start, sdpso.target, sdpso.v)
             path_1, path_2, path_3 = smooth_path(path_1, path_2, path_3)
             UAV.v = 3
             print('SDPSO iteration finish')
