@@ -73,7 +73,7 @@ class packet_processing(object):
         self.task_locking.append(fix)
         return packet, UAV_pos
     
-    def pack_SDPSO_packet(self, UAV_pos, UAV_velo):
+    def pack_SDPSO_packet(self, uav_id, UAV_pos, UAV_velo):
         '''
         [message_id, uav_id, start, target]
         UAV_pos = np.matrix([xn yn])
@@ -89,12 +89,13 @@ class packet_processing(object):
         return packet
 
     def unpack_SDPSO_packet(self, packet):
+        uav_id = unpack('B', packet[0])
         xn = unpack('i', packet[1:5])[0] * 1e-3
         yn = unpack('i', packet[5:9])[0] * 1e-3
         xv = unpack('i', packet[9:13])[0] * 1e-3
         yv = unpack('i', packet[13:17])[0] * 1e-3
         print('unpack SDPSO successfully!')
-        return np.array([[xn, yn], [xv, yv]])
+        return [[uav_id], np.array([[xn, yn], [xv, yv]])]
 
     def SEAD_info_clear(self):
         self.uavs_info = [[] for _ in range(10)]
