@@ -350,7 +350,7 @@ if __name__ == "__main__":
                                 UAV1_packet = data_u2u.pack_SDPSO_packet(UAV.local_pose, UAV.local_velo)
                                 xbee.send_data_broadcast(UAV1_packet)
                                 print('UAV1 publish data')
-
+                                UAV2_packet = xbee.read_data()
                                 # Receive the information of UAVs after Tcomm seconds
                                 while UAV2_packet:
                                     if new_timer.check_period(0.5, previous_time_u2u):
@@ -393,7 +393,7 @@ if __name__ == "__main__":
                                 UAV2_packet = data_u2u.pack_SDPSO_packet(UAV.local_pose, UAV.local_velo)
                                 xbee.send_data_broadcast(UAV2_packet)
                                 print('UAV2 publish data')
-
+                                UAV1_packet = xbee.read_data()
                                 # Receive the information of UAVs after Tcomm seconds
                                 while UAV1_packet:
                                     if new_timer.check_period(0.5, previous_time_u2u):
