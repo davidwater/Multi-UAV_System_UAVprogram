@@ -343,7 +343,7 @@ if __name__ == "__main__":
                     v_z = 0.3 * (height - UAV.local_pose[2])  # altitude hold
                     UAV.velocity_bodyFrame_control(target_V, u, v_z)
 
-                    while True:
+                    while update:
                         try:
                             if new_timer.check_timer(u2u_interval, previous_time_u2u, delay = -0.1) and not back_to_base:
                                 previous_time_u2u = time.time()
@@ -353,11 +353,16 @@ if __name__ == "__main__":
                                 UAV2_packet = xbee.read_data()
                                 # Receive the information of UAVs after Tcomm seconds
                                 while UAV2_packet:
+                                    info = data_u2u.unpack_SDPSO_packet(UAV2_packet.data)
+                                    xs2 = info[0,0]
+                                    ys2 = info[0,1]
+                                    xv2 = info[1,0]
+                                    yv2 = info[1,1]
                                     if new_timer.check_period(0.5, previous_time_u2u):
                                         print('check')
                                         if update:
-                                            sdpso.start[0,2:4] = data_u2u.uavs_info[1] * 1e-3
-                                            sdpso.v[0,2:4] = data_u2u.uavs_info[2] * 1e-3
+                                            sdpso.start[0,2:4] = np.array([[xs2, ys2]])
+                                            sdpso.v[0,2:4] = np.array([[xv2, yv2]])
                                             update = False
                                             print('data exchange!')
                                             break
@@ -396,11 +401,16 @@ if __name__ == "__main__":
                                 UAV1_packet = xbee.read_data()
                                 # Receive the information of UAVs after Tcomm seconds
                                 while UAV1_packet:
+                                    info = data_u2u.unpack_SDPSO_packet(UAV1_packet.data)
+                                    xs1 = info[0,0]
+                                    ys1 = info[0,1]
+                                    xv1 = info[1,0]
+                                    yv2 = info[1,1]
                                     if new_timer.check_period(0.5, previous_time_u2u):
                                         print('check')
                                         if update:
-                                            sdpso.start[0,0:2] = data_u2u.uavs_info[1] * 1e-3
-                                            sdpso.v[0,0:2] = data_u2u.uavs_info[2] * 1e-3
+                                            sdpso.start[0,0:2] = np.array([[xs1, ys1]])
+                                            sdpso.v[0,0:2] = np.array([[xv1, yv1]])
                                             update = False
                                             print('data exchange!')
                                             break

@@ -79,7 +79,7 @@ class packet_processing(object):
         UAV_pos = np.matrix([xn yn])
         UAV_velo = np.matrix([xv yv])
         '''
-        packet = pack('<BBiiii', Message_ID.SDPSO.value, self.uav_id,
+        packet = pack('<Biiii', self.uav_id,
                       int(UAV_pos[0]*1e3), int(UAV_pos[1]*1e3),
                       int(UAV_velo[0]*1e3), int(UAV_velo[1]*1e3))
         'Add the information of the UAV itself'
@@ -87,6 +87,14 @@ class packet_processing(object):
         self.uavs_info[1].append(UAV_pos)
         self.uavs_info[2].append(UAV_velo)
         return packet
+
+    def unpack_SDPSO_packet(self, packet):
+        xn = unpack('i', packet[1:5])[0] * 1e-3
+        yn = unpack('i', packet[5:9])[0] * 1e-3
+        xv = unpack('i', packet[9:13])[0] * 1e-3
+        yv = unpack('i', packet[13:17])[0] * 1e-3
+        print('unpack SDPSO successfully!')
+        return np.array([[xn, yn], [xv, yv]])
 
     def SEAD_info_clear(self):
         self.uavs_info = [[] for _ in range(10)]
