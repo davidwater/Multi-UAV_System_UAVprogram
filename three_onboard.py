@@ -319,20 +319,20 @@ if __name__ == "__main__":
             update = True
             previous_time_u2u = time.time()
             if uav_id == 1:
-                sdpso.start[0,2:4] = np.array([-150,10])
-                sdpso.start[0,4:6] = np.array([-175,10])  
-                sdpso.target[0,2:4] = np.array([-200,100])  
-                sdpso.target[0,4:6] = np.array([-175,100])  
+                sdpso.start[0,2:4] = np.array([-70,20])
+                sdpso.start[0,4:6] = np.array([-120,20])  
+                sdpso.target[0,2:4] = np.array([-70,120])  
+                sdpso.target[0,4:6] = np.array([-20,120])  
             elif uav_id == 2:
-                sdpso.start[0,0:2] = np.array([-200,10])
-                sdpso.start[0,4:6] = np.array([-175,10]) 
-                sdpso.target[0,0:2] = np.array([-150,100])
-                sdpso.target[0,4:6] = np.array([-175,100]) 
+                sdpso.start[0,0:2] = np.array([-20,20])
+                sdpso.start[0,4:6] = np.array([-120,20]) 
+                sdpso.target[0,0:2] = np.array([-120,120])
+                sdpso.target[0,4:6] = np.array([-20,120]) 
             elif uav_id == 3:
-                sdpso.start[0,0:2] = np.array([-200,10])
-                sdpso.start[0,2:4] = np.array([-150,10])
-                sdpso.target[0,0:2] = np.array([-150,100])
-                sdpso.target[0,2:4] = np.array([-200,100])   
+                sdpso.start[0,0:2] = np.array([-20,20])
+                sdpso.start[0,2:4] = np.array([-70,20])
+                sdpso.target[0,0:2] = np.array([-120,120])
+                sdpso.target[0,2:4] = np.array([-70,120])   
             ' Broadcast every T seceods'
             new_timer.t()
             if new_timer.check_timer(interval = 2, previous_send_time = 0, delay = -0.1) and not back_to_base:
@@ -356,6 +356,7 @@ if __name__ == "__main__":
             xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} SDPSO iteration finish!", new_timer.t()))
 
             if uav_id == 1:
+                print('UAV1 path following')
                 tracking1 = CraigReynolds_Path_Following(WaypointMissionMethod.CraigReynolds_Path_Following, 1, path = path_1, path_window = 3, Kp = 1, Kd = 5)
                 desirePoint, index, _, error_of_distance = tracking1.get_desirePoint_withWindow(UAV.v, UAV.local_pose[0], UAV.local_pose[1], UAV.yaw, index)
                 u, pre_error = tracking1.PID_control(UAV.v, UAV.Rmin, UAV.local_pose, UAV.yaw, desirePoint, pre_error)
