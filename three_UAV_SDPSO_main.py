@@ -445,6 +445,7 @@ def plot_path(it, x1, y1, x2, y2, x3, y3):
     return None
 
 def generate_path(start, target, v):
+    start_time = time.time()
     path_1 = np.array([[start[0,0], start[0,1]]])
     path_2 = np.array([[start[0,2], start[0,3]]])
     path_3 = np.array([[start[0,4], start[0,5]]])
@@ -464,7 +465,7 @@ def generate_path(start, target, v):
     ds = 10
     Varsize = 6
     it = 0
-    dt = 0.5    # update rate
+    dt = 0.35    # update rate
     d1 = 0      # UAV1 moving distance
     d2 = 0      # UAV2 moving distance
     d3 = 0      # UAV3 moving distance
@@ -523,7 +524,7 @@ def generate_path(start, target, v):
         d2 = math.sqrt((path_2[it+1, 0] - path_2[it, 0]) ** 2 + (path_2[it+1, 1] - path_2[it, 1]) ** 2)
         d3 = math.sqrt((path_3[it+1, 0] - path_3[it, 0]) ** 2 + (path_3[it+1, 1] - path_3[it, 1]) ** 2)
         d_total += (d1 + d2 + d3)
-        print(f'Iteration: {it}, Cost value = {cost[it]}')
+        # print(f'Iteration: {it}, Cost value = {cost[it]}')
 
     print(f'Cost value = {cost[it]}')
     print(f'Process time: {time.time() - start_time} (sec)')
@@ -537,9 +538,9 @@ def smooth_path(path_1, path_2, path_3):
     path_2 = path_2[path_2[:,0].argsort()]
     path_3 = path_3[path_3[:,0].argsort()]
 
-    s_1 = path_1.shape[0] * 7
-    s_2 = path_2.shape[0] * 7
-    s_3 = path_3.shape[0] * 7
+    s_1 = path_1.shape[0] * 2
+    s_2 = path_2.shape[0] * 2
+    s_3 = path_3.shape[0] * 2
 
     # spline regression
     tck_1 = splrep(path_1[:,0], path_1[:,1], s = s_1)
@@ -555,29 +556,23 @@ def smooth_path(path_1, path_2, path_3):
 if __name__ == "__main__":
     # initial parameters
     xv1 = 0; yv1 = 0; xv2 = 0; yv2 = 0; xv3 = 0; yv3 = 0
-    xs1 = -200; ys1 = 10; xg1 = -150; yg1 = 100
-    xs2 = -150; ys2 = 10; xg2 = -200; yg2 = 100
-    xs3 = -175; ys3 = 10; xg3 = -175; yg3 = 100
+    xs1 = -20; ys1 = 20; xg1 = -120; yg1 = 120
+    xs2 = -70; ys2 = 20; xg2 = -70; yg2 = 120
+    xs3 = -125; ys3 = 20; xg3 = -20; yg3 = 120
     v = np.matrix([xv1, yv1, xv2, yv2, xv3, yv3])
     start = np.matrix([xs1, ys1, xs2, ys2, xs3, ys3])
     target = np.matrix([xg1, yg1, xg2, yg2, xg3, yg3])
-    start_time = time.time()
     path_1, path_2, path_3, h, d_total, cost = generate_path(start, target, v)
 
-    # sort array
-    path_1 = path_1[path_1[:,0].argsort()]
-    path_2 = path_2[path_2[:,0].argsort()]
-    path_3 = path_3[path_3[:,0].argsort()]
+    # smooth path
+    path_1_, path_2_, path_3_ = smooth_path(path_1, path_2, path_3)
 
     # spline regression
-    tck_1 = splrep(path_1[:,0], path_1[:,1], s = path_1.shape[0] * 10)
-    tck_2 = splrep(path_2[:,0], path_2[:,1], s = path_2.shape[0] * 10)
-    tck_3 = splrep(path_3[:,0], path_3[:,1], s = path_3.shape[0] * 10)
     plt.scatter(path_1[:,0], path_1[:,1], color = 'red', s=1, label = 'UAV 1')
     plt.scatter(path_2[:,0], path_2[:,1], color = 'blue', s=1, label = 'UAV 2')
     plt.scatter(path_3[:,0], path_3[:,1], color = 'green', s=1, label = 'UAV 3')
-    plt.plot(path_1[:,0], BSpline(*tck_1)(path_1[:,0]), label = 'UAV 1 spline')
-    plt.plot(path_2[:,0], BSpline(*tck_2)(path_2[:,0]), label = 'UAV 2 spline')
-    plt.plot(path_3[:,0], BSpline(*tck_3)(path_3[:,0]), label = 'UAV 3 spline')
+    plt.plot(path_1_[:,0], path_1_[:,1], label = 'UAV 1 spline')
+    plt.plot(path_2_[:,0], path_2_[:,1], label = 'UAV 2 spline')
+    plt.plot(path_3_[:,0], path_3_[:,1], label = 'UAV 3 spline')
     plt.legend()
     plt.show()
