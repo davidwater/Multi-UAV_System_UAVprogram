@@ -30,9 +30,9 @@ class SDPSO(object):
         self.uav_position = []
         self.depots = []
         'SDPSO parameters'
-        self.MaxIt = 50       # Maximum Number of Iterations
+        self.MaxIt = 10       # Maximum Number of Iterations
         self.nPop_max = 100    # Population Size (Swarm Size)
-        self.nPop_min = 50     # Population Size (Swarm Size)
+        self.nPop_min = 25     # Population Size (Swarm Size)
         self.w = 1             # Inertia Weight
         self.wdamp = 0.99      # Inertia Weight Damping Ratio
         self.c1 = 1.5          # Personal Learning Coefficient
@@ -397,7 +397,7 @@ def generate_path(start, target, v):
     ds = 10
     Varsize = 4
     it = 0
-    dt = 0.5    # update rate
+    dt = 0.25    # update rate
     d1 = 0      # UAV1 moving distance
     d2 = 0      # UAV2 moving distance
     d_total = 0 # total moving distance

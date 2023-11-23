@@ -221,7 +221,7 @@ if __name__ == "__main__":
                         pre_error = None
                         index = 0
                         xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"received SDPSO mission", new_timer.t()))
-                        UAV.Rmin = [0][0]
+                        UAV.Rmin = info[0][0]
                         if uav_id == 1:
                             sdpso.start[0,0:2] = np.array([[info[1][0,0], info[1][0,1]]])
                             sdpso.target[0,0:2] = np.array([[info[1][1,0], info[1][1,1]]])
@@ -353,11 +353,16 @@ if __name__ == "__main__":
                             target_V = UAV.v
                         else:
                             target_V, u = 0, 0
-                            UAV.set_mode(Mode.POSHOLD.name)
-                            xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} set to POSHOLD!", new_timer.t()))
                             completed = True
+                            update = False
                         v_z = 0.3 * (height - UAV.local_pose[2])  # altitude hold
                         UAV.velocity_bodyFrame_control(target_V, u, v_z)
+
+                    if np.linalg.norm(path_1[-1][:2] - np.array(UAV.local_pose[:2])) <= waypoint_radius and completed:
+                        xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} SDPSO mission completed!", new_timer.t()))
+                        back_to_base = True
+                        UAV.set_mode(Mode.POSHOLD.name)
+                        xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} set to POSHOLD!", new_timer.t()))
 
                     while update:
                         try:
@@ -371,7 +376,7 @@ if __name__ == "__main__":
                                 # Receive the information of UAVs after Tcomm seconds
                                 while UAV2_packet:
                                     info = data_u2u.unpack_SDPSO_packet(UAV2_packet.data)
-                                    uav_id = info[0][0]
+                                    uav_packet_id = info[0][0]
                                     xs2 = info[1][0,0]
                                     ys2 = info[1][0,1]
                                     xv2 = info[1][1,0]
@@ -390,13 +395,6 @@ if __name__ == "__main__":
                         except KeyboardInterrupt:
                             break                     
 
-                    if np.linalg.norm(path_1[-1][:2] - np.array(UAV.local_pose[:2])) <= waypoint_radius and not completed:
-                        xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} SDPSO mission completed!", new_timer.t()))
-                        completed = True
-                        back_to_base = True
-                        UAV.set_mode(Mode.POSHOLD.name)
-                        xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} set to POSHOLD!", new_timer.t()))
-
                 elif uav_id == 2:
                     start_time = time.time()
                     print(f'UAV{uav_id} path following')
@@ -408,11 +406,16 @@ if __name__ == "__main__":
                             target_V = UAV.v
                         else:
                             target_V, u = 0, 0
-                            UAV.set_mode(Mode.POSHOLD.name)
-                            xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} set to POSHOLD!", new_timer.t()))
                             completed = True
+                            update = False
                         v_z = 0.3 * (height - UAV.local_pose[2])  # altitude hold
                         UAV.velocity_bodyFrame_control(target_V, u, v_z)
+
+                    if np.linalg.norm(path_2[-1][:2] - np.array(UAV.local_pose[:2])) <= waypoint_radius and completed:
+                        xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} SDPSO mission completed!", new_timer.t()))
+                        back_to_base = True
+                        UAV.set_mode(Mode.POSHOLD.name)
+                        xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} set to POSHOLD!", new_timer.t()))
 
                     while update:
                         try:
@@ -426,7 +429,7 @@ if __name__ == "__main__":
                                 # Receive the information of UAVs after Tcomm seconds
                                 while UAV1_packet:
                                     info = data_u2u.unpack_SDPSO_packet(UAV1_packet.data)
-                                    uav_id = info[0][0]
+                                    uav_packet_id = info[0][0]
                                     xs1 = info[1][0,0]
                                     ys1 = info[1][0,1]
                                     xv1 = info[1][1,0]
@@ -444,15 +447,6 @@ if __name__ == "__main__":
                                             break
                         except KeyboardInterrupt:
                             break
-                        
-                    if np.linalg.norm(path_2[-1][:2] - np.array(UAV.local_pose[:2])) <= waypoint_radius and not completed:
-                        xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} SDPSO mission completed!", new_timer.t()))
-                        completed = True
-                        back_to_base = True
-                        UAV.set_mode(Mode.POSHOLD.name)
-                        xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} set to POSHOLD!", new_timer.t()))
-                        
-
 
             elif Mission == Message_ID.Mission_Abort:
                 if UAV.frame_type == FrameType.Quad:
