@@ -508,21 +508,28 @@ def generate_path(start, target, v):
             path_2[it+1, 0] += 0.01
         elif (h3_ == math.pi/4 or h3_ == 0.75*math.pi or h3_ == -math.pi/4 or h3_ == -0.75*math.pi):
             path_3[it+1, 0] += 0.01
-        # plot_path(it, np.array(path_1[:, 0]), np.array(path_1[:, 1]), np.array(path_2[:, 0]), np.array(path_2[:, 1]))
 
-        # check if UAVs arrive goals
-        if (math.sqrt((path_1[it+1, 0] - target[0,0]) ** 2 + (path_1[it+1, 1] - target[0,1]) ** 2) < df and  
-        math.sqrt((path_2[it+1, 0] - target[0,2]) ** 2 + (path_2[it+1, 1] - target[0,3]) ** 2) < df and  
-        math.sqrt((path_3[it+1, 0] - target[0,4]) ** 2 + (path_3[it+1, 1] - target[0,5]) ** 2) < df):
+        if (math.sqrt((path_1[it+1, 0] - target[0,0]) ** 2 + (path_1[it+1, 1] - target[0,1]) ** 2) < df):
             path_1[it+1, 0] = target[0,0]
             path_1[it+1, 1] = target[0,1]
+            UAV1_arrive = True
+
+        if (math.sqrt((path_2[it+1, 0] - target[0,2]) ** 2 + (path_2[it+1, 1] - target[0,3]) ** 2) < df):
             path_2[it+1, 0] = target[0,2]
             path_2[it+1, 1] = target[0,3]
+            UAV2_arrive = True
+        
+        if (math.sqrt((path_3[it+1, 0] - target[0,4]) ** 2 + (path_3[it+1, 1] - target[0,5]) ** 2) < df):
             path_3[it+1, 0] = target[0,4]
             path_3[it+1, 1] = target[0,5]
-            # plot_path(it, np.array(path_1[:, 0]), np.array(path_1[:, 1]), np.array(path_2[:, 0]), np.array(path_2[:, 1]))
+            UAV3_arrive = True
+        
+        # plot_path(it, np.array(path_1[:, 0]), np.array(path_1[:, 1]), np.array(path_2[:, 0]), np.array(path_2[:, 1]))
+        # check if UAVs arrive goals
+        if UAV1_arrive and UAV2_arrive and UAV3_arrive:
             # plt.show()
             break
+            
         # moving distance
         d1 = math.sqrt((path_1[it+1, 0] - path_1[it, 0]) ** 2 + (path_1[it+1, 1] - path_1[it, 1]) ** 2)
         d2 = math.sqrt((path_2[it+1, 0] - path_2[it, 0]) ** 2 + (path_2[it+1, 1] - path_2[it, 1]) ** 2)

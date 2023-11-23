@@ -391,6 +391,8 @@ def generate_path(start, target, v):
         path_2[0, 0] += 0.01
     h =np.matrix([h1, h2])
 
+    UAV1_arrive = False
+    UAV2_arrive = False
     iteration = 1000
     ds = 10
     Varsize = 4
@@ -417,7 +419,7 @@ def generate_path(start, target, v):
         path_2_y = path_2[it,1] + wvy2*dt
         path_1 = np.append(path_1, [[path_1_x, path_1_y]], axis = 0)
         path_2 = np.append(path_2, [[path_2_x, path_2_y]], axis = 0)
-        #print(f'iteration: {it+1}, UAV1_x: {path_1[it+1, 0]}, UAV1_y: {path_1[it+1, 1]}, UAV2_x: {path_2[it+1, 0]}, UAV2_y: {path_2[it+1, 1]}, cost: {cost[it+1]}')
+        # print(f'iteration: {it+1}, UAV1_x: {path_1[it+1, 0]}, UAV1_y: {path_1[it+1, 1]}, UAV2_x: {path_2[it+1, 0]}, UAV2_y: {path_2[it+1, 1]}, cost: {cost[it+1]}')
         # update heading
         h1_ = heading(path_1_x, target[0,0], path_1_y, target[0,1])
         h2_ = heading(path_2_x, target[0,2], path_2_y, target[0,3])
@@ -428,20 +430,27 @@ def generate_path(start, target, v):
         elif (h2_ == math.pi/4 or h2_ == 0.75*math.pi or h2_ == -math.pi/4 or h2_ == -0.75*math.pi):
             path_2[it+1, 0] += 0.01
         
-        # check if UAVs arrive goals
-        if math.sqrt((path_1[it+1, 0] - target[0,0]) ** 2 + (path_1[it+1, 1] - target[0,1]) ** 2) < df and math.sqrt((path_2[it+1, 0] - target[0,2]) ** 2 + (path_2[it+1, 1] - target[0,3]) ** 2) < df:
+        
+        if (math.sqrt((path_1[it+1, 0] - target[0,0]) ** 2 + (path_1[it+1, 1] - target[0,1]) ** 2) < df): 
             path_1[it+1, 0] = target[0,0]
             path_1[it+1, 1] = target[0,1]
+            UAV1_arrive = True
+
+        if (math.sqrt((path_2[it+1, 0] - target[0,2]) ** 2 + (path_2[it+1, 1] - target[0,3]) ** 2) < df):
             path_2[it+1, 0] = target[0,2]
             path_2[it+1, 1] = target[0,3]
-            # plot_path(it, np.array(path_1[:, 0]), np.array(path_1[:, 1]), np.array(path_2[:, 0]), np.array(path_2[:, 1]))
+            UAV2_arrive = True
+
+        # plot_path(it, np.array(path_1[:, 0]), np.array(path_1[:, 1]), np.array(path_2[:, 0]), np.array(path_2[:, 1]))
+        # check if UAVs arrive goals
+        if UAV1_arrive and UAV2_arrive:
             # plt.show()
             break
+
         # moving distance
         d1 = math.sqrt((path_1[it+1, 0] - path_1[it, 0]) ** 2 + (path_1[it+1, 1] - path_1[it, 1]) ** 2)
         d2 = math.sqrt((path_2[it+1, 0] - path_2[it, 0]) ** 2 + (path_2[it+1, 1] - path_2[it, 1]) ** 2)
         d_total += (d1 + d2)
-        # plot_path(it, np.array(path_1[:, 0]), np.array(path_1[:, 1]), np.array(path_2[:, 0]), np.array(path_2[:, 1]))
         # print(f'Iteration: {it}, Cost value = {cost[it]}')
 
     print(f'Cost value = {cost[it]}')
