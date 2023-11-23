@@ -350,6 +350,7 @@ if __name__ == "__main__":
                 print('SDPSO iteration finish')
                 xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} SDPSO iteration finish!", new_timer.t()))
                 # save path
+                i = 0
                 with open (f'3_UAVs_path_{i}.csv','w', newline='') as csvfile:
                     writer = csv.writer(csvfile)
                     writer.writerow(['UAV1_x', 'UAV1_y', 'UAV2_x', 'UAV2_y', 'UAV3_x', 'UAV3_y'])

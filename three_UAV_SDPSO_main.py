@@ -462,6 +462,9 @@ def generate_path(start, target, v):
         path_3[0, 0] += 0.01
     h =np.matrix([h1, h2, h3])
 
+    UAV1_arrive = False
+    UAV2_arrive = False
+    UAV3_arrive = False
     iteration = 1000
     ds = 10
     Varsize = 6
