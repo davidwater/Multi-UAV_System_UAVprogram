@@ -378,6 +378,7 @@ def plot_path(it, x1, y1, x2, y2):
     return None
 
 def generate_path(start, target, v):
+    start_time = time.time()
     path_1 = np.array([[start[0,0], start[0,1]]])
     path_2 = np.array([[start[0,2], start[0,3]]])
     h1 = heading(xn=start[0,0], target_xn=target[0,0], yn=start[0,1], target_yn=target[0,1])
@@ -393,7 +394,7 @@ def generate_path(start, target, v):
     ds = 10
     Varsize = 4
     it = 0
-    dt = 0.5    # update rate
+    dt = 0.35    # update rate
     d1 = 0      # UAV1 moving distance
     d2 = 0      # UAV2 moving distance
     d_total = 0 # total moving distance
@@ -453,8 +454,8 @@ def smooth_path(path_1, path_2):
     path_1 = path_1[path_1[:,0].argsort()]
     path_2 = path_2[path_2[:,0].argsort()]
 
-    s_1 = path_1.shape[0] * 0.5
-    s_2 = path_2.shape[0] * 0.5
+    s_1 = path_1.shape[0] * 2
+    s_2 = path_2.shape[0] * 2
 
     # spline regression
     tck_1 = splrep(path_1[:,0], path_1[:,1], s = s_1)
@@ -473,21 +474,17 @@ if __name__ == "__main__":
     v = np.matrix([xv1, yv1, xv2, yv2])
     start = np.matrix([xs1, ys1, xs2, ys2])
     target = np.matrix([xg1, yg1, xg2, yg2])
-    start_time = time.time()
     path_1, path_2, h, d_total, cost = generate_path(start, target, v)
 
-    # sort array
-    path_1 = path_1[path_1[:,0].argsort()]
-    path_2 = path_2[path_2[:,0].argsort()]
+    # smooth path 
+    path_1_, path_2_ = smooth_path(path_1, path_2)
 
     # spline regression
-    tck_1 = splrep(path_1[:,0], path_1[:,1], s = path_1.shape[0] * 0.01)
-    tck_2 = splrep(path_2[:,0], path_2[:,1], s = path_2.shape[0] * 0.01)
     plt.scatter(path_1[:,0], path_1[:,1], color = 'blue', s=1, label = 'UAV 1')
     plt.scatter(path_2[:,0], path_2[:,1], color = 'red', s=1, label = 'UAV 2')
     # plt.plot(path_1[:,0], path_1[:,1], color = 'blue', label = 'UAV 1', ls = '-.')
     # plt.plot(path_2[:,0], path_2[:,1], color = 'red', label = 'UAV 2', ls = '-.')
-    plt.plot(path_1[:,0], BSpline(*tck_1)(path_1[:,0]), label = 'UAV 1 spline')
-    plt.plot(path_2[:,0], BSpline(*tck_2)(path_2[:,0]), label = 'UAV 2 spline')
+    plt.plot(path_1_[:,0], path_1_[:,1], label = 'UAV 1 spline')
+    plt.plot(path_2_[:,0], path_2_[:,1], label = 'UAV 2 spline')
     plt.legend()
     plt.show()
