@@ -387,7 +387,7 @@ if __name__ == "__main__":
                             # Receive the information of UAVs after Tcomm seconds
                             while UAV_packet:
                                 info = data_u2u.unpack_SDPSO_packet(UAV_packet.data)
-                                uav_packet_id = info[0]
+                                uav_packet_id = info[0][0]
                                 xs = info[1][0,0]
                                 ys = info[1][0,1]
                                 xv = info[1][1,0]
@@ -457,7 +457,7 @@ if __name__ == "__main__":
                             # Receive the information of UAVs after Tcomm seconds
                             while UAV_packet:
                                 info = data_u2u.unpack_SDPSO_packet(UAV_packet.data)
-                                uav_packet_id = info[0]
+                                uav_packet_id = info[0][0]
                                 xs = info[1][0,0]
                                 ys = info[1][0,1]
                                 xv = info[1][1,0]
@@ -527,7 +527,7 @@ if __name__ == "__main__":
                             # Receive the information of UAVs after Tcomm seconds
                             while UAV_packet:
                                 info = data_u2u.unpack_SDPSO_packet(UAV_packet.data)
-                                uav_packet_id = info[0]
+                                uav_packet_id = info[0][0]
                                 xs = info[1][0,0]
                                 ys = info[1][0,1]
                                 xv = info[1][1,0]

@@ -31,8 +31,8 @@ class SDPSO(object):
         self.depots = []
         'SDPSO parameters'
         self.MaxIt = 50       # Maximum Number of Iterations
-        self.nPop_max = 300    # Population Size (Swarm Size)
-        self.nPop_min = 200     # Population Size (Swarm Size)
+        self.nPop_max = 100    # Population Size (Swarm Size)
+        self.nPop_min = 50     # Population Size (Swarm Size)
         self.w = 1             # Inertia Weight
         self.wdamp = 0.99      # Inertia Weight Damping Ratio
         self.c1 = 1.5          # Personal Learning Coefficient
