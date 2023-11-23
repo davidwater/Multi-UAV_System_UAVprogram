@@ -3,6 +3,7 @@ import time
 import math
 import matplotlib.pyplot as plt
 from scipy.interpolate import splrep, BSpline
+import csv
 
 class SDPSO(object):
     def __init__(self, start, target, v, h, path_1, path_2, path_3, it, ds, Varsize):
@@ -33,9 +34,9 @@ class SDPSO(object):
         self.uav_position = []
         self.depots = []
         'SDPSO parameters'
-        self.MaxIt = 75       # Maximum Number of Iterations
-        self.nPop_max = 100    # Population Size (Swarm Size)
-        self.nPop_min = 50     # Population Size (Swarm Size)
+        self.MaxIt = 50       # Maximum Number of Iterations
+        self.nPop_max = 400    # Population Size (Swarm Size)
+        self.nPop_min = 300     # Population Size (Swarm Size)
         self.w = 1             # Inertia Weight
         self.wdamp = 0.99      # Inertia Weight Damping Ratio
         self.c1 = 1.5          # Personal Learning Coefficient
@@ -394,7 +395,7 @@ class SDPSO(object):
         return cost_2
     
     def cal_cost_3(self, theta_1, theta_1_old, theta_2, theta_2_old, theta_3, theta_3_old):
-        k = 100
+        k = 300
         theta_max = math.pi/3
         coeff_pun_1 = k * math.exp(-(((theta_1 - theta_1_old)/theta_max) ** 2))
         coeff_pun_2 = k * math.exp(-(((theta_2 - theta_2_old)/theta_max) ** 2))
@@ -465,7 +466,7 @@ def generate_path(start, target, v):
     ds = 10
     Varsize = 6
     it = 0
-    dt = 0.35    # update rate
+    dt = 0.5    # update rate
     d1 = 0      # UAV1 moving distance
     d2 = 0      # UAV2 moving distance
     d3 = 0      # UAV3 moving distance
@@ -538,9 +539,9 @@ def smooth_path(path_1, path_2, path_3):
     path_2 = path_2[path_2[:,0].argsort()]
     path_3 = path_3[path_3[:,0].argsort()]
 
-    s_1 = path_1.shape[0] * 2
-    s_2 = path_2.shape[0] * 2
-    s_3 = path_3.shape[0] * 2
+    s_1 = path_1.shape[0] * 5
+    s_2 = path_2.shape[0] * 5
+    s_3 = path_3.shape[0] * 5
 
     # spline regression
     tck_1 = splrep(path_1[:,0], path_1[:,1], s = s_1)
@@ -558,11 +559,17 @@ if __name__ == "__main__":
     xv1 = 0; yv1 = 0; xv2 = 0; yv2 = 0; xv3 = 0; yv3 = 0
     xs1 = -20; ys1 = 20; xg1 = -120; yg1 = 120
     xs2 = -70; ys2 = 20; xg2 = -70; yg2 = 120
-    xs3 = -125; ys3 = 20; xg3 = -20; yg3 = 120
+    xs3 = -120; ys3 = 20; xg3 = -20; yg3 = 120
     v = np.matrix([xv1, yv1, xv2, yv2, xv3, yv3])
     start = np.matrix([xs1, ys1, xs2, ys2, xs3, ys3])
     target = np.matrix([xg1, yg1, xg2, yg2, xg3, yg3])
     path_1, path_2, path_3, h, d_total, cost = generate_path(start, target, v)
+
+    # save path
+    with open('3_UAVs_SDPSO_path.csv', 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(['UAV1_x', 'UAV1_y', 'UAV2_x', 'UAV2_y', 'UAV3_x', 'UAV3_y'])
+        writer.writerows(zip(*[path_1[:,0], path_1[:,1], path_2[:,0], path_2[:,1], path_3[:,0], path_3[:,1]]))
 
     # smooth path
     path_1_, path_2_, path_3_ = smooth_path(path_1, path_2, path_3)

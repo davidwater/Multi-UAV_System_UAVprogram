@@ -220,7 +220,7 @@ if __name__ == "__main__":
                         pre_error = None
                         index = 0
                         xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"received SDPSO mission", new_timer.t()))
-                        UAV.Rmin = info[0]
+                        UAV.Rmin = info[0,0]
                         if uav_id == 1:
                             sdpso.start[0,0:2] = np.array([[info[1][0,0], info[1][0,1]]])
                             sdpso.target[0,0:2] = np.array([[info[1][1,0], info[1][1,1]]])
@@ -333,6 +333,12 @@ if __name__ == "__main__":
                     UAV.v = 3
                     print('SDPSO iteration finish')
                     xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} SDPSO iteration finish!", new_timer.t()))
+                    # save path
+                    i = o
+                    with open (f'2_UAVs_path_{i}.csv','w', newline='') as csvfile:
+                        writer = csv.writer(csvfile)
+                        writer.writerow(['UAV1_x', 'UAV1_y', 'UAV2_x', 'UAV2_y'])
+                        writer.writerows(zip(*[path_1[:,0], path_1[:,1], path_2[:,0], path_2[:,1]]))  
 
                 if uav_id == 1:
                     start_time = time.time()

@@ -3,6 +3,7 @@ import time
 import math
 import matplotlib.pyplot as plt
 from scipy.interpolate import splrep, BSpline
+import csv
 
 class SDPSO(object):
     def __init__(self, start, target, v, h, path_1, path_2, it, ds, Varsize):
@@ -29,9 +30,9 @@ class SDPSO(object):
         self.uav_position = []
         self.depots = []
         'SDPSO parameters'
-        self.MaxIt = 80       # Maximum Number of Iterations
-        self.nPop_max = 100    # Population Size (Swarm Size)
-        self.nPop_min = 50     # Population Size (Swarm Size)
+        self.MaxIt = 50       # Maximum Number of Iterations
+        self.nPop_max = 300    # Population Size (Swarm Size)
+        self.nPop_min = 200     # Population Size (Swarm Size)
         self.w = 1             # Inertia Weight
         self.wdamp = 0.99      # Inertia Weight Damping Ratio
         self.c1 = 1.5          # Personal Learning Coefficient
@@ -394,7 +395,7 @@ def generate_path(start, target, v):
     ds = 10
     Varsize = 4
     it = 0
-    dt = 0.35    # update rate
+    dt = 0.5    # update rate
     d1 = 0      # UAV1 moving distance
     d2 = 0      # UAV2 moving distance
     d_total = 0 # total moving distance
@@ -475,6 +476,12 @@ if __name__ == "__main__":
     start = np.matrix([xs1, ys1, xs2, ys2])
     target = np.matrix([xg1, yg1, xg2, yg2])
     path_1, path_2, h, d_total, cost = generate_path(start, target, v)
+
+    # save path
+    with open('2_UAVs_SDPSO_path.csv', 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(['UAV1_x', 'UAV1_y', 'UAV2_x', 'UAV2_y'])
+        writer.writerows(zip(*[path_1[:,0], path_1[:,1], path_2[:,0], path_2[:,1]]))
 
     # smooth path 
     path_1_, path_2_ = smooth_path(path_1, path_2)
