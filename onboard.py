@@ -221,7 +221,7 @@ if __name__ == "__main__":
                         pre_error = None
                         index = 0
                         xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"received SDPSO mission", new_timer.t()))
-                        UAV.Rmin = info[0]
+                        UAV.Rmin = int(info[0])
                         if uav_id == 1:
                             sdpso.start[0,0:2] = np.array([[info[1][0,0], info[1][0,1]]])
                             sdpso.target[0,0:2] = np.array([[info[1][1,0], info[1][1,1]]])

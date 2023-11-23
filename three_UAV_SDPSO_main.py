@@ -549,9 +549,9 @@ def smooth_path(path_1, path_2, path_3):
     path_2 = path_2[path_2[:,0].argsort()]
     path_3 = path_3[path_3[:,0].argsort()]
 
-    s_1 = path_1.shape[0] * 5
-    s_2 = path_2.shape[0] * 5
-    s_3 = path_3.shape[0] * 5
+    s_1 = path_1.shape[0]
+    s_2 = path_2.shape[0]
+    s_3 = path_3.shape[0]
 
     # spline regression
     tck_1 = splrep(path_1[:,0], path_1[:,1], s = s_1)
