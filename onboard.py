@@ -327,11 +327,9 @@ if __name__ == "__main__":
                         sdpso.start[0,0:2] = np.array([-200,10])
                         sdpso.target[0,0:2] = np.array([-150,100]) 
                         initialization = True
-                print(f'start: {sdpso.start}')
-                print(f'target: {sdpso.target}')
+
                 if not completed:
                     path_1, path_2, h, d_total, cost = generate_path(sdpso.start, sdpso.target, sdpso.v)
-                    path_1, path_2 = smooth_path(path_1, path_2)
                     UAV.v = 3
                     print('SDPSO iteration finish')
                     xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} SDPSO iteration finish!", new_timer.t()))
