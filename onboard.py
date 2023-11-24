@@ -220,6 +220,7 @@ if __name__ == "__main__":
                         update = True       
                         pre_error = None
                         index = 0
+                        i = 1
                         xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"received SDPSO mission", new_timer.t()))
                         UAV.Rmin = info[0][0]
                         if uav_id == 1:
@@ -334,18 +335,17 @@ if __name__ == "__main__":
                     print('SDPSO iteration finish')
                     xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} SDPSO iteration finish!", new_timer.t()))
                     # save path
-                    i = 1
                     with open (f'2_UAVs_path_{i}.csv','w', newline='') as csvfile:
                         writer = csv.writer(csvfile)
                         writer.writerow(['UAV1_x', 'UAV1_y', 'UAV2_x', 'UAV2_y'])
                         writer.writerows(zip(*[path_1[:,0], path_1[:,1], path_2[:,0], path_2[:,1]]))
-                    i += 1 
                     print(f'Successfully saved path {i} times!')
+                    i += 1 
                     xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} saved path!", new_timer.t()))
 
                 if uav_id == 1:
                     start_time = time.time()
-                    while (time.time() - start_time <= 3):
+                    while (time.time() - start_time <= 3.1):
                         tracking1 = CraigReynolds_Path_Following(WaypointMissionMethod.CraigReynolds_Path_Following, 1, path = path_1, path_window = 3, Kp = 1, Kd = 5)
                         desirePoint, index, _, error_of_distance = tracking1.get_desirePoint_withWindow(UAV.v, UAV.local_pose[0], UAV.local_pose[1], UAV.yaw, index)
                         u, pre_error = tracking1.PID_control(UAV.v, UAV.Rmin, UAV.local_pose, UAV.yaw, desirePoint, pre_error)
@@ -354,7 +354,6 @@ if __name__ == "__main__":
                         else:
                             target_V, u = 0, 0
                             completed = True
-                            update = False
                         v_z = 0.3 * (height - UAV.local_pose[2])  # altitude hold
                         UAV.velocity_bodyFrame_control(target_V, u, v_z)
                         if (time.time() - start_time == 3):
@@ -366,6 +365,7 @@ if __name__ == "__main__":
                         back_to_base = True
                         UAV.set_mode(Mode.POSHOLD.name)
                         xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} set to POSHOLD!", new_timer.t()))
+                        update = False
 
                     while update:
                         try:
@@ -399,7 +399,7 @@ if __name__ == "__main__":
 
                 elif uav_id == 2:
                     start_time = time.time()
-                    while (time.time() - start_time <= 3):
+                    while (time.time() - start_time <= 3.1):
                         tracking2 = CraigReynolds_Path_Following(WaypointMissionMethod.CraigReynolds_Path_Following, 1, path = path_2, path_window = 3, Kp = 1, Kd = 5)
                         desirePoint, index, _, error_of_distance = tracking2.get_desirePoint_withWindow(UAV.v, UAV.local_pose[0], UAV.local_pose[1], UAV.yaw, index)
                         u, pre_error = tracking2.PID_control(UAV.v, UAV.Rmin, UAV.local_pose, UAV.yaw, desirePoint, pre_error)
@@ -408,7 +408,6 @@ if __name__ == "__main__":
                         else:
                             target_V, u = 0, 0
                             completed = True
-                            update = False
                         v_z = 0.3 * (height - UAV.local_pose[2])  # altitude hold
                         UAV.velocity_bodyFrame_control(target_V, u, v_z)
                         if (time.time() - start_time == 3):
@@ -420,6 +419,7 @@ if __name__ == "__main__":
                         back_to_base = True
                         UAV.set_mode(Mode.POSHOLD.name)
                         xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} set to POSHOLD!", new_timer.t()))
+                        update = False
 
                     while update:
                         try:
