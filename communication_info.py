@@ -89,7 +89,7 @@ class packet_processing(object):
         return packet
 
     def unpack_SDPSO_packet(self, packet):
-        uav_id = unpack('B', packet[0])
+        uav_id = packet[0]
         xn = unpack('i', packet[1:5])[0] * 1e-3
         yn = unpack('i', packet[5:9])[0] * 1e-3
         xv = unpack('i', packet[9:13])[0] * 1e-3

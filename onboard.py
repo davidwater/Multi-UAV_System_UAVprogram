@@ -327,7 +327,8 @@ if __name__ == "__main__":
                         sdpso.start[0,0:2] = np.array([-200,10])
                         sdpso.target[0,0:2] = np.array([-150,100]) 
                         initialization = True
-
+                print(f'start: {sdpso.start}')
+                print(f'target: {sdpso.target}')
                 if not completed:
                     path_1, path_2, h, d_total, cost = generate_path(sdpso.start, sdpso.target, sdpso.v)
                     path_1, path_2 = smooth_path(path_1, path_2)
@@ -340,7 +341,8 @@ if __name__ == "__main__":
                         writer = csv.writer(csvfile)
                         writer.writerow(['UAV1_x', 'UAV1_y', 'UAV2_x', 'UAV2_y'])
                         writer.writerows(zip(*[path_1[:,0], path_1[:,1], path_2[:,0], path_2[:,1]]))
-                    i += 1  
+                    i += 1 
+                    print(f'{i} successfully save path!')
 
                 if uav_id == 1:
                     start_time = time.time()
@@ -356,7 +358,7 @@ if __name__ == "__main__":
                             update = False
                         v_z = 0.3 * (height - UAV.local_pose[2])  # altitude hold
                         UAV.velocity_bodyFrame_control(target_V, u, v_z)
-                    print(f'UAV{uav_id} path following finished!')
+                        print(f'UAV{uav_id} path following finished!')
 
                     if np.linalg.norm(path_1[-1][:2] - np.array(UAV.local_pose[:2])) <= waypoint_radius and completed:
                         xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} SDPSO mission completed!", new_timer.t()))
@@ -382,7 +384,6 @@ if __name__ == "__main__":
                                     xv2 = info[1][1,0]
                                     yv2 = info[1][1,1]
                                     if new_timer.check_period(0.5, previous_time_u2u):
-                                        print('check')
                                         if update:
                                             sdpso.start[0,2:4] = np.array([[xs2, ys2]])
                                             sdpso.v[0,2:4] = np.array([[xv2, yv2]])
@@ -409,7 +410,7 @@ if __name__ == "__main__":
                             update = False
                         v_z = 0.3 * (height - UAV.local_pose[2])  # altitude hold
                         UAV.velocity_bodyFrame_control(target_V, u, v_z)
-                    print(f'UAV{uav_id} path following finished!')
+                        print(f'UAV{uav_id} path following finished!')
 
                     if np.linalg.norm(path_2[-1][:2] - np.array(UAV.local_pose[:2])) <= waypoint_radius and completed:
                         xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} SDPSO mission completed!", new_timer.t()))
@@ -435,7 +436,6 @@ if __name__ == "__main__":
                                     xv1 = info[1][1,0]
                                     yv1 = info[1][1,1]
                                     if new_timer.check_period(0.5, previous_time_u2u):
-                                        print('check')
                                         if update:
                                             sdpso.start[0,0:2] = np.array([[xs1, ys1]])
                                             sdpso.v[0,0:2] = np.array([[xv1, yv1]])

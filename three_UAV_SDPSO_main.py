@@ -34,9 +34,9 @@ class SDPSO(object):
         self.uav_position = []
         self.depots = []
         'SDPSO parameters'
-        self.MaxIt = 50       # Maximum Number of Iterations
-        self.nPop_max = 400    # Population Size (Swarm Size)
-        self.nPop_min = 300     # Population Size (Swarm Size)
+        self.MaxIt = 10       # Maximum Number of Iterations
+        self.nPop_max = 100    # Population Size (Swarm Size)
+        self.nPop_min = 30     # Population Size (Swarm Size)
         self.w = 1             # Inertia Weight
         self.wdamp = 0.99      # Inertia Weight Damping Ratio
         self.c1 = 1.5          # Personal Learning Coefficient
@@ -469,7 +469,7 @@ def generate_path(start, target, v):
     ds = 10
     Varsize = 6
     it = 0
-    dt = 0.5    # update rate
+    dt = 0.4    # update rate
     d1 = 0      # UAV1 moving distance
     d2 = 0      # UAV2 moving distance
     d3 = 0      # UAV3 moving distance
@@ -549,9 +549,9 @@ def smooth_path(path_1, path_2, path_3):
     path_2 = path_2[path_2[:,0].argsort()]
     path_3 = path_3[path_3[:,0].argsort()]
 
-    s_1 = path_1.shape[0]
-    s_2 = path_2.shape[0]
-    s_3 = path_3.shape[0]
+    s_1 = path_1.shape[0] * 5
+    s_2 = path_2.shape[0] * 10
+    s_3 = path_3.shape[0] * 5
 
     # spline regression
     tck_1 = splrep(path_1[:,0], path_1[:,1], s = s_1)
