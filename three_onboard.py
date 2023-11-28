@@ -425,8 +425,9 @@ if __name__ == "__main__":
                                             else:
                                                 print('no data to exchange')
                                                 break
-                            if not update_2 and not update_3:
-                                update = False 
+
+                                    if not update_2 and not update_3:
+                                        update = False 
                         except KeyboardInterrupt:
                             break
 
@@ -496,8 +497,9 @@ if __name__ == "__main__":
                                             else:
                                                 print(f'UAV packet {uav_packet_id} no data to exchange')
                                                 break
-                            if not update_1 and not update_3:
-                                update = False 
+
+                                    if not update_1 and not update_3:
+                                        update = False 
                         except KeyboardInterrupt:
                             break
 
@@ -567,8 +569,9 @@ if __name__ == "__main__":
                                             else:
                                                 print(f'UAV packet {uav_packet_id} no data to exchange')
                                                 break
-                            if not update_1 and not update_2:
-                                update = False 
+                                            
+                                    if not update_1 and not update_2:
+                                        update = False 
                         except KeyboardInterrupt:
                             break
             
