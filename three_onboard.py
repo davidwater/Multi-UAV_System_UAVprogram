@@ -347,7 +347,6 @@ if __name__ == "__main__":
             while not completed:
                 update = True
                 path_1, path_2, path_3, h, d_total, cost = generate_path(sdpso.start, sdpso.target, sdpso.v)
-                path_1, path_2, path_3 = smooth_path(path_1, path_2, path_3)
                 UAV.v = 3
                 print('SDPSO iteration finish')
                 xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} SDPSO iteration finish!", new_timer.t()))
@@ -363,7 +362,7 @@ if __name__ == "__main__":
                 if uav_id == 1:
                     start_time = time.time()
                     print('UAV{uav_id} path following')
-                    while (time.time() - start_time <= 3.1):
+                    while (time.time() - start_time <= 2.1):
                         tracking1 = CraigReynolds_Path_Following(WaypointMissionMethod.CraigReynolds_Path_Following, 1, path = path_1, path_window = 3, Kp = 1, Kd = 5)
                         desirePoint, index, _, error_of_distance = tracking1.get_desirePoint_withWindow(UAV.v, UAV.local_pose[0], UAV.local_pose[1], UAV.yaw, index)
                         u, pre_error = tracking1.PID_control(UAV.v, UAV.Rmin, UAV.local_pose, UAV.yaw, desirePoint, pre_error)
@@ -373,7 +372,7 @@ if __name__ == "__main__":
                             target_V, u = 0, 0
                         v_z = 0.3 * (height - UAV.local_pose[2])  # altitude hold
                         UAV.velocity_bodyFrame_control(target_V, u, v_z)
-                        if (time.time() - start.time == 3):
+                        if (time.time() - start.time == 2):
                             print(f'UAV{uav_id} path following finished!')
                             xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} path fllowing finished!", new_timer.t()))
 
