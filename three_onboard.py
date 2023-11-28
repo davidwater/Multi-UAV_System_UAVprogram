@@ -24,8 +24,8 @@ class Timer(object):
         self.delay = None
 
     def t(self):
-        # print(f'current time: {t() + self.bias}')
-        print(f'time sychronization: {int((t() + self.bias + self.delay) * 10) % int(self.interval * 10) == 0}')
+        if int((t() + self.bias + self.delay) * 10) % int(self.interval * 10) == 0:
+            print(f'time sychronization: {int((t() + self.bias + self.delay) * 10) % int(self.interval * 10) == 0}')
         return t() + self.bias
 
     def check_timer(self, interval, previous_send_time, delay=0):
