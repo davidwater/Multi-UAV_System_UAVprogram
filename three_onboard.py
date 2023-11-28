@@ -224,7 +224,7 @@ if __name__ == "__main__":
                     index = 0
                     i = 1
                     xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"received SDPSO mission", new_timer.t()))
-                    UAV.Rmin = info[0]
+                    UAV.Rmin = info[0][0]
                     if uav_id == 1:
                         sdpso.start[0,0:2] = np.array([[info[1][0,0], info[1][0,1]]])
                         sdpso.target[0,0:2] = np.array([[info[1][1,0], info[1][1,1]]])
@@ -372,7 +372,7 @@ if __name__ == "__main__":
                             target_V, u = 0, 0
                         v_z = 0.3 * (height - UAV.local_pose[2])  # altitude hold
                         UAV.velocity_bodyFrame_control(target_V, u, v_z)
-                        if (time.time() - start.time == 2):
+                        if (time.time() - start_time == 2):
                             print(f'UAV{uav_id} path following finished!')
                             xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} path fllowing finished!", new_timer.t()))
 
@@ -433,7 +433,7 @@ if __name__ == "__main__":
                 elif uav_id == 2:
                     start_time = time.time()
                     print('UAV{uav_id} path following')
-                    while (time.time() - start_time < 3):
+                    while (time.time() - start_time <= 2.1):
                         tracking2 = CraigReynolds_Path_Following(WaypointMissionMethod.CraigReynolds_Path_Following, 1, path = path_2, path_window = 3, Kp = 1, Kd = 5)
                         desirePoint, index, _, error_of_distance = tracking2.get_desirePoint_withWindow(UAV.v, UAV.local_pose[0], UAV.local_pose[1], UAV.yaw, index)
                         u, pre_error = tracking2.PID_control(UAV.v, UAV.Rmin, UAV.local_pose, UAV.yaw, desirePoint, pre_error)
@@ -443,7 +443,7 @@ if __name__ == "__main__":
                             target_V, u = 0, 0
                         v_z = 0.3 * (height - UAV.local_pose[2])  # altitude hold
                         UAV.velocity_bodyFrame_control(target_V, u, v_z)
-                        if (time.time() - start.time == 3):
+                        if (time.time() - start_time == 2):
                             print(f'UAV{uav_id} path following finished!')
                             xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} path fllowing finished!", new_timer.t()))
 
@@ -504,7 +504,7 @@ if __name__ == "__main__":
                 elif uav_id == 3:
                     start_time = time.time()
                     print('UAV{uav_id} path following')
-                    while (time.time() - start_time < 3):
+                    while (time.time() - start_time <= 2.1):
                         tracking3 = CraigReynolds_Path_Following(WaypointMissionMethod.CraigReynolds_Path_Following, 1, path = path_3, path_window = 3, Kp = 1, Kd = 5)
                         desirePoint, index, _, error_of_distance = tracking3.get_desirePoint_withWindow(UAV.v, UAV.local_pose[0], UAV.local_pose[1], UAV.yaw, index)
                         u, pre_error = tracking3.PID_control(UAV.v, UAV.Rmin, UAV.local_pose, UAV.yaw, desirePoint, pre_error)
@@ -514,7 +514,7 @@ if __name__ == "__main__":
                             target_V, u = 0, 0
                         v_z = 0.3 * (height - UAV.local_pose[2])  # altitude hold
                         UAV.velocity_bodyFrame_control(target_V, u, v_z)
-                        if (time.time() - start.time == 3):
+                        if (time.time() - start_time == 2):
                             print(f'UAV{uav_id} path following finished!')
                             xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} path fllowing finished!", new_timer.t()))
 
