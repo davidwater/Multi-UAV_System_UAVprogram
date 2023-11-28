@@ -361,7 +361,7 @@ if __name__ == "__main__":
 
                 if uav_id == 1:
                     start_time = time.time()
-                    print('UAV{uav_id} path following')
+                    print(f'UAV{uav_id} path following')
                     while (time.time() - start_time <= 2.1):
                         tracking1 = CraigReynolds_Path_Following(WaypointMissionMethod.CraigReynolds_Path_Following, 1, path = path_1, path_window = 3, Kp = 1, Kd = 5)
                         desirePoint, index, _, error_of_distance = tracking1.get_desirePoint_withWindow(UAV.v, UAV.local_pose[0], UAV.local_pose[1], UAV.yaw, index)
@@ -386,8 +386,6 @@ if __name__ == "__main__":
 
                     while update:
                         try:
-                            if not update_2 and not update_3:
-                                update = False 
                             ' Broadcast every T seceods'
                             if new_timer.check_timer(u2u_interval, previous_time_u2u, delay = -0.1) and not back_to_base:
                                 previous_time_u2u = time.time()
@@ -427,12 +425,14 @@ if __name__ == "__main__":
                                             else:
                                                 print('no data to exchange')
                                                 break
+                            if not update_2 and not update_3:
+                                update = False 
                         except KeyboardInterrupt:
                             break
 
                 elif uav_id == 2:
                     start_time = time.time()
-                    print('UAV{uav_id} path following')
+                    print(f'UAV{uav_id} path following')
                     while (time.time() - start_time <= 2.1):
                         tracking2 = CraigReynolds_Path_Following(WaypointMissionMethod.CraigReynolds_Path_Following, 1, path = path_2, path_window = 3, Kp = 1, Kd = 5)
                         desirePoint, index, _, error_of_distance = tracking2.get_desirePoint_withWindow(UAV.v, UAV.local_pose[0], UAV.local_pose[1], UAV.yaw, index)
@@ -457,8 +457,6 @@ if __name__ == "__main__":
 
                     while update:
                         try:
-                            if not update_1 and not update_3:
-                                update = False 
                             ' Broadcast every T seceods'
                             if new_timer.check_timer(u2u_interval, previous_time_u2u, delay = -0.1) and not back_to_base:
                                 previous_time_u2u = time.time()
@@ -498,12 +496,14 @@ if __name__ == "__main__":
                                             else:
                                                 print(f'UAV packet {uav_packet_id} no data to exchange')
                                                 break
+                            if not update_1 and not update_3:
+                                update = False 
                         except KeyboardInterrupt:
                             break
 
                 elif uav_id == 3:
                     start_time = time.time()
-                    print('UAV{uav_id} path following')
+                    print(f'UAV{uav_id} path following')
                     while (time.time() - start_time <= 2.1):
                         tracking3 = CraigReynolds_Path_Following(WaypointMissionMethod.CraigReynolds_Path_Following, 1, path = path_3, path_window = 3, Kp = 1, Kd = 5)
                         desirePoint, index, _, error_of_distance = tracking3.get_desirePoint_withWindow(UAV.v, UAV.local_pose[0], UAV.local_pose[1], UAV.yaw, index)
@@ -528,8 +528,6 @@ if __name__ == "__main__":
 
                     while update:
                         try:
-                            if not update_1 and not update_2:
-                                update = False 
                             ' Broadcast every T seceods'
                             if new_timer.check_timer(u2u_interval, previous_time_u2u, delay = -0.1) and not back_to_base:
                                 previous_time_u2u = time.time()
@@ -569,6 +567,8 @@ if __name__ == "__main__":
                                             else:
                                                 print(f'UAV packet {uav_packet_id} no data to exchange')
                                                 break
+                            if not update_1 and not update_2:
+                                update = False 
                         except KeyboardInterrupt:
                             break
             
