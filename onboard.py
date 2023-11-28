@@ -329,6 +329,7 @@ if __name__ == "__main__":
                         sdpso.target[0,0:2] = np.array([-150,100]) 
                         initialization = True
                 while not completed:
+                    update = True
                     path_1, path_2, h, d_total, cost = generate_path(sdpso.start, sdpso.target, sdpso.v)
                     UAV.v = 3
                     print('SDPSO iteration finish')

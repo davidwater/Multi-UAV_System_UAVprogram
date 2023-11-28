@@ -345,6 +345,7 @@ if __name__ == "__main__":
                     initialization = True
 
             while not completed:
+                update = True
                 path_1, path_2, path_3, h, d_total, cost = generate_path(sdpso.start, sdpso.target, sdpso.v)
                 path_1, path_2, path_3 = smooth_path(path_1, path_2, path_3)
                 UAV.v = 3
