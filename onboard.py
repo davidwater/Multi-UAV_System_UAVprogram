@@ -321,12 +321,12 @@ if __name__ == "__main__":
                 data_u2u = packet_processing(uav_id)
                 if not initialization:
                     if uav_id == 1:
-                        sdpso.start[0,2:4] = np.array([-150,100]) 
+                        sdpso.start[0,2:4] = np.array([-150,-40]) 
                         sdpso.target[0,2:4] = np.array([-200,10])
                         initialization = True  
                     elif uav_id == 2:
                         sdpso.start[0,0:2] = np.array([-200,10])
-                        sdpso.target[0,0:2] = np.array([-150,100]) 
+                        sdpso.target[0,0:2] = np.array([-150,-40]) 
                         initialization = True
                 while not completed:
                     update = True
@@ -386,7 +386,9 @@ if __name__ == "__main__":
                                         yv2 = info[1][1,1]
                                         if new_timer.check_period(0.5, previous_time_u2u):
                                             if update:
+                                                sdpso.start[0,0:2] = np.array([[UAV.local_pose[0], UAV.local_pose[1]]])
                                                 sdpso.start[0,2:4] = np.array([[xs2, ys2]])
+                                                sdpso.v[0,0:2] = np.array([[UAV.local_velo[0], UAV.local_velo[1]]])
                                                 sdpso.v[0,2:4] = np.array([[xv2, yv2]])
                                                 update = False
                                                 print('data exchange!')
@@ -441,7 +443,9 @@ if __name__ == "__main__":
                                         if new_timer.check_period(0.5, previous_time_u2u):
                                             if update:
                                                 sdpso.start[0,0:2] = np.array([[xs1, ys1]])
+                                                sdpso.start[0,2:4] = np.array([[UAV.local_pose[0], UAV.local_pose[1]]])
                                                 sdpso.v[0,0:2] = np.array([[xv1, yv1]])
+                                                sdpso.v[0,2:4] = np.array([[UAV.local_velo[0], UAV.local_velo[1]]])
                                                 update = False
                                                 print('data exchange!')
                                                 break

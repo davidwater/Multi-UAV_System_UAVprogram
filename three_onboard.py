@@ -326,22 +326,22 @@ if __name__ == "__main__":
             data_u2u = packet_processing(uav_id)
             if not initialization:
                 if uav_id == 1:
-                    sdpso.start[0,2:4] = np.array([-70,20])
-                    sdpso.start[0,4:6] = np.array([-120,20])  
-                    sdpso.target[0,2:4] = np.array([-70,120])  
-                    sdpso.target[0,4:6] = np.array([-20,120])  
+                    sdpso.start[0,2:4] = np.array([-200,-40])
+                    sdpso.start[0,4:6] = np.array([-250,-40])  
+                    sdpso.target[0,2:4] = np.array([-200,60])  
+                    sdpso.target[0,4:6] = np.array([-150,60])  
                     initialization = True
                 elif uav_id == 2:
-                    sdpso.start[0,0:2] = np.array([-20,20])
-                    sdpso.start[0,4:6] = np.array([-120,20]) 
-                    sdpso.target[0,0:2] = np.array([-120,120])
-                    sdpso.target[0,4:6] = np.array([-20,120])
+                    sdpso.start[0,0:2] = np.array([-150,-40])
+                    sdpso.start[0,4:6] = np.array([-250,-40]) 
+                    sdpso.target[0,0:2] = np.array([-250,60])
+                    sdpso.target[0,4:6] = np.array([-150,60])
                     initialization = True 
                 elif uav_id == 3:
-                    sdpso.start[0,0:2] = np.array([-20,20])
-                    sdpso.start[0,2:4] = np.array([-70,20])
-                    sdpso.target[0,0:2] = np.array([-120,120])
-                    sdpso.target[0,2:4] = np.array([-70,120])   
+                    sdpso.start[0,0:2] = np.array([-150,-40])
+                    sdpso.start[0,2:4] = np.array([-200,-40])
+                    sdpso.target[0,0:2] = np.array([-250,60])
+                    sdpso.target[0,2:4] = np.array([-200,60])   
                     initialization = True
 
             while not completed:
@@ -425,7 +425,8 @@ if __name__ == "__main__":
                                             else:
                                                 print('no data to exchange')
                                                 break
-
+                                    sdpso.start[0,0:2] = np.array([[UAV.local_pose[0], UAV.local_pose[1]]])
+                                    sdpso.v[0,0:2] = np.array([[UAV.local_velo[0], UAV.local_velo[1]]])
                                     if not update_2 and not update_3:
                                         update = False 
                         except KeyboardInterrupt:
@@ -497,7 +498,8 @@ if __name__ == "__main__":
                                             else:
                                                 print(f'UAV packet {uav_packet_id} no data to exchange')
                                                 break
-
+                                    sdpso.start[0,2:4] = np.array([[UAV.local_pose[0], UAV.local_pose[1]]])
+                                    sdpso.v[0,2:4] = np.array([[UAV.local_velo[0], UAV.local_velo[1]]])
                                     if not update_1 and not update_3:
                                         update = False 
                         except KeyboardInterrupt:
@@ -569,7 +571,8 @@ if __name__ == "__main__":
                                             else:
                                                 print(f'UAV packet {uav_packet_id} no data to exchange')
                                                 break
-                                            
+                                    sdpso.start[0,4:6] = np.array([[UAV.local_pose[0], UAV.local_pose[1]]])
+                                    sdpso.v[0,4:6] = np.array([[UAV.local_velo[0], UAV.local_velo[1]]])
                                     if not update_1 and not update_2:
                                         update = False 
                         except KeyboardInterrupt:
