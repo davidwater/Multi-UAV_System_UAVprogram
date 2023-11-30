@@ -377,7 +377,7 @@ if __name__ == "__main__":
                         if (time.time() - start_time == 2):
                             print(f'UAV{uav_id} path following finished!')
                             xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} path fllowing finished!", new_timer.t()))
-                        pose = np.append(pose, [UAV.local_pose[0],UAV.local_pose[1]], axis = 0)
+                        pose = np.append(pose, [[UAV.local_pose[0],UAV.local_pose[1]]], axis = 0)
                     # save pose
                     with open (f'3_UAVs_pose_{j}.csv','w', newline='') as csvfile:
                         writer = csv.writer(csvfile)
@@ -460,7 +460,7 @@ if __name__ == "__main__":
                         if (time.time() - start_time == 2):
                             print(f'UAV{uav_id} path following finished!')
                             xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} path fllowing finished!", new_timer.t()))
-                        pose = np.append(pose, [UAV.local_pose[0],UAV.local_pose[1]], axis = 0)
+                        pose = np.append(pose, [[UAV.local_pose[0],UAV.local_pose[1]]], axis = 0)
                     # save pose
                     with open (f'3_UAVs_pose_{j}.csv','w', newline='') as csvfile:
                         writer = csv.writer(csvfile)
@@ -542,7 +542,7 @@ if __name__ == "__main__":
                         if (time.time() - start_time == 2):
                             print(f'UAV{uav_id} path following finished!')
                             xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} path fllowing finished!", new_timer.t()))
-                        pose = np.append(pose, [UAV.local_pose[0],UAV.local_pose[1]], axis = 0)
+                        pose = np.append(pose, [[UAV.local_pose[0],UAV.local_pose[1]]], axis = 0)
                     # save pose
                     with open (f'3_UAVs_pose_{j}.csv','w', newline='') as csvfile:
                         writer = csv.writer(csvfile)
