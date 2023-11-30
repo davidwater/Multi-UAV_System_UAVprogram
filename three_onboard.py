@@ -210,6 +210,7 @@ if __name__ == "__main__":
                         success = UAV.set_mode(Mode.GUIDED.name)
 
                 elif messageType == Message_ID.SDPSO:
+                    pose = np.array([[UAV.local_pose[0], UAV.local_pose[1]]])
                     height = np.round(UAV.local_pose[2])
                     Mission = Message_ID.SDPSO
                     previous_time_u2u = 0
@@ -223,6 +224,7 @@ if __name__ == "__main__":
                     pre_error = None
                     index = 0
                     i = 1
+                    j = 1
                     xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"received SDPSO mission", new_timer.t()))
                     UAV.Rmin = info[0][0]
                     if uav_id == 1:
@@ -375,6 +377,16 @@ if __name__ == "__main__":
                         if (time.time() - start_time == 2):
                             print(f'UAV{uav_id} path following finished!')
                             xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} path fllowing finished!", new_timer.t()))
+                        pose = np.append(pose, [UAV.local_pose[0],UAV.local_pose[1]], axis = 0)
+                    # save pose
+                    with open (f'3_UAVs_pose_{j}.csv','w', newline='') as csvfile:
+                        writer = csv.writer(csvfile)
+                        writer.writerow(['UAV1_x', 'UAV1_y'])
+                        writer.writerows(zip(*[pose[:,0], pose[:,1]])) 
+                    print(f'Successfully saved pose {j} times!')
+                    j += 1
+                    xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} saved pose!", new_timer.t()))
+
 
                     if np.linalg.norm(path_1[-1][:2] - np.array(UAV.local_pose[:2])) <= waypoint_radius and completed:
                         xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} SDPSO mission completed!", new_timer.t()))
@@ -448,6 +460,15 @@ if __name__ == "__main__":
                         if (time.time() - start_time == 2):
                             print(f'UAV{uav_id} path following finished!')
                             xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} path fllowing finished!", new_timer.t()))
+                        pose = np.append(pose, [UAV.local_pose[0],UAV.local_pose[1]], axis = 0)
+                    # save pose
+                    with open (f'3_UAVs_pose_{j}.csv','w', newline='') as csvfile:
+                        writer = csv.writer(csvfile)
+                        writer.writerow(['UAV2_x', 'UAV2_y'])
+                        writer.writerows(zip(*[pose[:,0], pose[:,1]])) 
+                    print(f'Successfully saved pose {j} times!')
+                    j += 1
+                    xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} saved pose!", new_timer.t()))
 
                     if np.linalg.norm(path_1[-1][:2] - np.array(UAV.local_pose[:2])) <= waypoint_radius and completed:
                         xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} SDPSO mission completed!", new_timer.t()))
@@ -521,6 +542,15 @@ if __name__ == "__main__":
                         if (time.time() - start_time == 2):
                             print(f'UAV{uav_id} path following finished!')
                             xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} path fllowing finished!", new_timer.t()))
+                        pose = np.append(pose, [UAV.local_pose[0],UAV.local_pose[1]], axis = 0)
+                    # save pose
+                    with open (f'3_UAVs_pose_{j}.csv','w', newline='') as csvfile:
+                        writer = csv.writer(csvfile)
+                        writer.writerow(['UAV3_x', 'UAV3_y'])
+                        writer.writerows(zip(*[pose[:,0], pose[:,1]])) 
+                    print(f'Successfully saved pose {j} times!')
+                    j += 1
+                    xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} saved pose!", new_timer.t()))
 
                     if np.linalg.norm(path_1[-1][:2] - np.array(UAV.local_pose[:2])) <= waypoint_radius and completed:
                         xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} SDPSO mission completed!", new_timer.t()))
