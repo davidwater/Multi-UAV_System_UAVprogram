@@ -48,6 +48,12 @@ class Timer(object):
             return True
         else:
             return False
+        
+    def time_period(self, previous_time):
+        if (t() - previous_time < 5):
+            return True
+        else:
+            return False
 
     def time_synchronize_process(self, central_device, client, client_id):
         '''
@@ -379,7 +385,7 @@ if __name__ == "__main__":
                                 ' Broadcast every T seceods'
                                 if new_timer.check_timer(u2u_interval, previous_time_u2u, delay = -0.1):
                                     previous_time_u2u = time.time()
-                                    if new_timer.check_period(2, previous_time_u2u):
+                                    if new_timer.time_period(previous_time_u2u):
                                         UAV1_packet = data_u2u.pack_SDPSO_packet(uav_id, UAV.local_pose, UAV.local_velo)
                                         xbee.send_data_broadcast(UAV1_packet)
                                         print(f'UAV{uav_id} publish data!')
@@ -400,12 +406,14 @@ if __name__ == "__main__":
                                             sdpso.v[0,2:4] = np.array([[xv2, yv2]])
                                             update = False
                                             print('data exchange!')
-                                            break
                                         else:
                                             print('no data to exchange')
+                                            xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} didn't receive data!", new_timer.t()))
                                             continue
-                                    else:
+                                    elif new_timer.check_period(5, previous_time_u2u):
                                         update = False
+                                    else:
+                                        continue
                                 else:
                                     continue
                             except KeyboardInterrupt:
@@ -447,7 +455,7 @@ if __name__ == "__main__":
                                 ' Broadcast every T seceods'
                                 if new_timer.check_timer(u2u_interval, previous_time_u2u, delay = -0.1):
                                     previous_time_u2u = time.time()
-                                    if new_timer.check_period(2, previous_time_u2u):
+                                    if new_timer.time_period(previous_time_u2u):
                                         UAV2_packet = data_u2u.pack_SDPSO_packet(uav_id, UAV.local_pose, UAV.local_velo)
                                         xbee.send_data_broadcast(UAV2_packet)
                                         print(f'UAV{uav_id} publish data')
@@ -468,12 +476,14 @@ if __name__ == "__main__":
                                             sdpso.v[0,2:4] = np.array([[UAV.local_velo[0], UAV.local_velo[1]]])
                                             update = False
                                             print('data exchange!')
-                                            break
                                         else:
                                             print('no data to exchange')
+                                            xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} didn't receive data!", new_timer.t()))
                                             continue
-                                    else:
+                                    elif new_timer.check_period(5, previous_time_u2u):
                                         update = False
+                                    else:
+                                        continue
                                 else:
                                     continue
                             except KeyboardInterrupt:
@@ -486,7 +496,7 @@ if __name__ == "__main__":
                     UAV.set_mode(Mode.LOITER.name)
 
                 
-            ' Mission cancal mechanism '
+            ' Mission cancel mechanism '
             if UAV.mode in stop_mode:
                 Mission = Message_ID.Default
 
