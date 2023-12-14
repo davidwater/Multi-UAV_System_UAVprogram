@@ -215,7 +215,6 @@ if __name__ == "__main__":
                     Mission = Message_ID.SDPSO
                     previous_time_u2u = 0
                     initialization = False
-                    back_to_base = False
                     completed = False
                     update = True
                     update_1 = True
@@ -224,7 +223,6 @@ if __name__ == "__main__":
                     pre_error = None
                     index = 0
                     i = 1
-                    j = 1
                     xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"received SDPSO mission", new_timer.t()))
                     UAV.Rmin = info[0][0]
                     if uav_id == 1:
@@ -379,18 +377,16 @@ if __name__ == "__main__":
                             xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} path fllowing finished!", new_timer.t()))
                         pose = np.append(pose, [[UAV.local_pose[0],UAV.local_pose[1]]], axis = 0)
                     # save pose
-                    with open (f'3_UAVs_pose_{j}.csv','w', newline='') as csvfile:
+                    with open (f'3UAVs_id_{uav_id}_pose.csv','w', newline='') as csvfile:
                         writer = csv.writer(csvfile)
                         writer.writerow(['UAV1_x', 'UAV1_y'])
                         writer.writerows(zip(*[pose[:,0], pose[:,1]])) 
-                    print(f'Successfully saved pose {j} times!')
-                    j += 1
+                    print(f'Successfully saved pose!')
                     xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} saved pose!", new_timer.t()))
 
 
                     if np.linalg.norm(path_1[-1][:2] - np.array(UAV.local_pose[:2])) <= waypoint_radius and completed:
                         xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} SDPSO mission completed!", new_timer.t()))
-                        back_to_base = True
                         UAV.set_mode(Mode.POSHOLD.name)
                         xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} set to POSHOLD!", new_timer.t()))
                         update = False
@@ -399,7 +395,7 @@ if __name__ == "__main__":
                     while update:
                         try:
                             ' Broadcast every T seceods'
-                            if new_timer.check_timer(u2u_interval, previous_time_u2u, delay = -0.1) and not back_to_base:
+                            if new_timer.check_timer(u2u_interval, previous_time_u2u, delay = -0.1):
                                 previous_time_u2u = time.time()
                                 UAV1_packet = data_u2u.pack_SDPSO_packet(uav_id, UAV.local_pose, UAV.local_velo)
                                 xbee.send_data_broadcast(UAV1_packet)
@@ -462,17 +458,15 @@ if __name__ == "__main__":
                             xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} path fllowing finished!", new_timer.t()))
                         pose = np.append(pose, [[UAV.local_pose[0],UAV.local_pose[1]]], axis = 0)
                     # save pose
-                    with open (f'3_UAVs_pose_{j}.csv','w', newline='') as csvfile:
+                    with open (f'3UAVs_id_{uav_id}_pose.csv','w', newline='') as csvfile:
                         writer = csv.writer(csvfile)
                         writer.writerow(['UAV2_x', 'UAV2_y'])
                         writer.writerows(zip(*[pose[:,0], pose[:,1]])) 
-                    print(f'Successfully saved pose {j} times!')
-                    j += 1
+                    print(f'Successfully saved pose!')
                     xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} saved pose!", new_timer.t()))
 
                     if np.linalg.norm(path_1[-1][:2] - np.array(UAV.local_pose[:2])) <= waypoint_radius and completed:
                         xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} SDPSO mission completed!", new_timer.t()))
-                        back_to_base = True
                         UAV.set_mode(Mode.POSHOLD.name)
                         xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} set to POSHOLD!", new_timer.t()))
                         update = False
@@ -481,7 +475,7 @@ if __name__ == "__main__":
                     while update:
                         try:
                             ' Broadcast every T seceods'
-                            if new_timer.check_timer(u2u_interval, previous_time_u2u, delay = -0.1) and not back_to_base:
+                            if new_timer.check_timer(u2u_interval, previous_time_u2u, delay = -0.1):
                                 previous_time_u2u = time.time()
                                 UAV2_packet = data_u2u.pack_SDPSO_packet(uav_id, UAV.local_pose, UAV.local_velo)
                                 xbee.send_data_broadcast(UAV2_packet)
@@ -544,17 +538,15 @@ if __name__ == "__main__":
                             xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} path fllowing finished!", new_timer.t()))
                         pose = np.append(pose, [[UAV.local_pose[0],UAV.local_pose[1]]], axis = 0)
                     # save pose
-                    with open (f'3_UAVs_pose_{j}.csv','w', newline='') as csvfile:
+                    with open (f'3UAVs_id_{uav_id}_pose.csv','w', newline='') as csvfile:
                         writer = csv.writer(csvfile)
                         writer.writerow(['UAV3_x', 'UAV3_y'])
                         writer.writerows(zip(*[pose[:,0], pose[:,1]])) 
-                    print(f'Successfully saved pose {j} times!')
-                    j += 1
+                    print(f'Successfully saved pose!')
                     xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} saved pose!", new_timer.t()))
 
                     if np.linalg.norm(path_1[-1][:2] - np.array(UAV.local_pose[:2])) <= waypoint_radius and completed:
                         xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} SDPSO mission completed!", new_timer.t()))
-                        back_to_base = True
                         UAV.set_mode(Mode.POSHOLD.name)
                         xbee.send_data_async(gcs_address, data.pack_record_time_packet(f"UAV{uav_id} set to POSHOLD!", new_timer.t()))
                         update = False
@@ -563,7 +555,7 @@ if __name__ == "__main__":
                     while update:
                         try:
                             ' Broadcast every T seceods'
-                            if new_timer.check_timer(u2u_interval, previous_time_u2u, delay = -0.1) and not back_to_base:
+                            if new_timer.check_timer(u2u_interval, previous_time_u2u, delay = -0.1):
                                 previous_time_u2u = time.time()
                                 UAV3_packet = data_u2u.pack_SDPSO_packet(uav_id, UAV.local_pose, UAV.local_velo)
                                 xbee.send_data_broadcast(UAV3_packet)
