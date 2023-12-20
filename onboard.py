@@ -380,11 +380,11 @@ if __name__ == "__main__":
                             update = False
                             completed = True
 
+                        previous_time_u2u = time.time()
                         while update:
                             try:
                                 ' Broadcast every T seceods'
                                 if new_timer.check_timer(u2u_interval, previous_time_u2u, delay = -0.1):
-                                    previous_time_u2u = time.time()
                                     if new_timer.time_period(previous_time_u2u):
                                         UAV1_packet = data_u2u.pack_SDPSO_packet(uav_id, UAV.local_pose, UAV.local_velo)
                                         xbee.send_data_broadcast(UAV1_packet)
@@ -450,11 +450,11 @@ if __name__ == "__main__":
                             update = False
                             completed = True
 
+                        previous_time_u2u = time.time()
                         while update:
                             try:
                                 ' Broadcast every T seceods'
                                 if new_timer.check_timer(u2u_interval, previous_time_u2u, delay = -0.1):
-                                    previous_time_u2u = time.time()
                                     if new_timer.time_period(previous_time_u2u):
                                         UAV2_packet = data_u2u.pack_SDPSO_packet(uav_id, UAV.local_pose, UAV.local_velo)
                                         xbee.send_data_broadcast(UAV2_packet)
